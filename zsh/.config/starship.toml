@@ -1,0 +1,105 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Catppuccin Mocha 风格：左侧保持简洁，右侧显示环境信息。
+palette = 'catppuccin_mocha'
+add_newline = false
+scan_timeout = 30
+command_timeout = 500
+
+format = """
+$username\
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$python\
+$nodejs\
+$rust\
+$golang\
+$docker_context\
+$cmd_duration\
+$line_break\
+$character"""
+
+[palettes.catppuccin_mocha]
+blue = '#89b4fa'
+green = '#a6e3a1'
+yellow = '#f9e2af'
+red = '#f38ba8'
+mauve = '#cba6f7'
+teal = '#94e2d5'
+peach = '#fab387'
+overlay0 = '#6c7086'
+
+[directory]
+style = 'bold blue'
+format = 'in [$path]($style) '
+truncation_length = 3
+truncate_to_repo = true
+home_symbol = '~'
+read_only = ' ro'
+read_only_style = 'red'
+
+[username]
+show_always = true
+style_user = 'bold mauve'
+style_root = 'bold red'
+format = '[$user]($style) '
+
+[git_branch]
+symbol = 'git '
+style = 'bold mauve'
+format = 'on [$symbol$branch]($style) '
+
+[git_status]
+style = 'red'
+format = '([$all_status$ahead_behind]($style) )'
+conflicted = '=${count}'
+ahead = '>${count}'
+behind = '<${count}'
+diverged = '<>${ahead_count}/${behind_count}'
+untracked = '?${count}'
+stashed = '≡${count}'
+modified = '!${count}'
+staged = '+${count}'
+renamed = 'r${count}'
+deleted = 'x${count}'
+
+[fill]
+symbol = ' '
+style = 'none'
+
+[python]
+symbol = 'py '
+style = 'yellow'
+format = 'via [$symbol$version( \($virtualenv\))]($style) '
+
+[nodejs]
+symbol = 'node '
+style = 'green'
+format = 'via [$symbol$version]($style) '
+
+[rust]
+symbol = 'rs '
+style = 'peach'
+format = 'via [$symbol$version]($style) '
+
+[golang]
+symbol = 'go '
+style = 'teal'
+format = 'via [$symbol$version]($style) '
+
+[docker_context]
+symbol = 'docker '
+style = 'blue'
+format = 'via [$symbol$context]($style) '
+
+[cmd_duration]
+min_time = 2000
+style = 'yellow'
+format = 'took [$duration]($style) '
+
+[character]
+success_symbol = '[➜](bold green)'
+error_symbol = '[×](bold red)'
+vimcmd_symbol = '[‹](bold yellow)'
