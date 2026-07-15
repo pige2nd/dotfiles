@@ -14,6 +14,11 @@ export FZF_ALT_C_OPTS="--walker=dir,follow,hidden --walker-skip=.git,node_module
 # 官方 Zsh 集成：Ctrl+R / Ctrl+T / Alt+C。
 source <(fzf --zsh)
 
+# `fzf --zsh` binds Tab to its own `**` completion. Restore fzf-tab so that
+# ordinary Zsh completion (commands, options, files, etc.) opens its fuzzy menu.
+bindkey -M emacs '^I' fzf-tab-complete
+bindkey -M viins '^I' fzf-tab-complete
+
 # WezTerm 会优先拦截 Ctrl+R 和 Ctrl+T，因此提供 Alt+R / Alt+T。
 bindkey -M emacs '\er' fzf-history-widget
 bindkey -M vicmd '\er' fzf-history-widget
