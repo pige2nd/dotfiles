@@ -14,6 +14,10 @@ export FZF_ALT_C_OPTS="--walker=dir,follow,hidden --walker-skip=.git,node_module
 # 官方 Zsh 集成：Ctrl+R / Ctrl+T / Alt+C。
 source <(fzf --zsh)
 
+# 让 fzf-tab 也能展示 WezTerm 和 Codex 的子命令、选项补全。
+(( $+commands[wezterm] )) && source <(wezterm shell-completion --shell zsh)
+(( $+commands[codex] )) && source <(codex completion zsh)
+
 # `fzf --zsh` binds Tab to its own `**` completion. Restore fzf-tab so that
 # ordinary Zsh completion (commands, options, files, etc.) opens its fuzzy menu.
 bindkey -M emacs '^I' fzf-tab-complete
