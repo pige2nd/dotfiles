@@ -134,7 +134,7 @@ for _, key in ipairs { 'h', 'j', 'k', 'l' } do
   table.insert(keys, smart_nav('resize', key))
 end
 
--- ━━ Leader 快捷键（Ctrl+B） ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ━━ Leader 快捷键（Alt+B） ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 local leader_keys = {
   -- 标签操作
   { key = 'c', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
@@ -187,8 +187,8 @@ end
 -- =========================================================
 function M.apply(config)
   if not my_toggle then
-    -- Leader: Ctrl+B；进入 tmux 前可切换到裸模式，避免和 tmux Prefix 冲突。
-    config.leader = { key = 'b', mods = 'CTRL', timeout_milliseconds = 800 }
+    -- Leader: Alt+B；进入 tmux 前可切换到裸模式，避免本地快捷键被截获。
+    config.leader = { key = 'b', mods = 'ALT', timeout_milliseconds = 800 }
     -- 使用副本，避免重载配置时反复插入 toggle 绑定。
     config.keys = {}
     for _, key in ipairs(keys) do
