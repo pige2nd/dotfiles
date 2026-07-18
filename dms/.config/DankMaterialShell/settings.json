@@ -584,7 +584,7 @@
         "controlCenterButton",
         "powerMenuButton"
       ],
-      "spacing": 6,
+      "spacing": 0,
       "innerPadding": 4,
       "barInsetPadding": 8,
       "bottomGap": 0,
