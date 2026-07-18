@@ -19,9 +19,9 @@ config.automatically_reload_config = true
 
 -- 设置zsh
 config.default_prog = { '/usr/bin/zsh', '-l'}
--- 使用 XWayland，让 GNOME 提供独立的标题栏和最小化/最大化/关闭按钮。
--- 原生 Wayland 下，当前桌面环境不会为 TITLE | RESIZE 绘制这组按钮。
-config.enable_wayland = false
+-- 使用原生 Wayland，使输入法候选窗与 niri 的输出缩放保持一致。
+-- niri 下是否显示 TITLE | RESIZE 对应的标题栏按钮取决于 Wayland 装饰支持。
+config.enable_wayland = true
 
 -- 不使用 WezTerm 自己的版本更新弹窗
 config.check_for_updates = false
