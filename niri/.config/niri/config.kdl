@@ -1,0 +1,47 @@
+// niri + DankMaterialShell
+// GNOME remains installed as a separate login session.
+
+input {
+    keyboard {
+        xkb {}
+        numlock
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+    }
+}
+
+environment {
+    XDG_CURRENT_DESKTOP "niri"
+    QT_QPA_PLATFORM "wayland"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+    QT_QPA_PLATFORMTHEME "gtk3"
+    QT_QPA_PLATFORMTHEME_QT6 "gtk3"
+}
+
+// WeChat's Qt input-method popup reads Xft.dpi from XWayland.
+spawn-at-startup "sh" "-lc" "xrdb -merge \"$HOME/.Xresources\""
+
+// DMS provides the visible bar and the background shell services (control
+// center, notifications, settings, lock screen, wallpaper and clipboard).
+// Vicinae is the primary launcher.
+layer-rule {
+    match namespace="^quickshell$"
+    place-within-backdrop true
+}
+
+layer-rule {
+    match namespace="dms:blurwallpaper"
+    place-within-backdrop true
+}
+
+// Keep application-side decorations from fighting niri's rounded layout.
+prefer-no-csd
+
+// DMS generates and live-updates these files.
+include "dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/alttab.kdl"
+include "dms/binds.kdl"

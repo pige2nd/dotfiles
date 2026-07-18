@@ -1,0 +1,14 @@
+--- usr/share/quickshell/dms/quickshell/Services/NotificationService.qml
++++ usr/share/quickshell/dms/quickshell/Services/NotificationService.qml
+@@ -775,9 +775,9 @@
+             interval: {
+                 if (!wrapper.notification)
+                     return 5000;
+-                // expireTimeout is already in milliseconds per the notification spec
++                // A positive expireTimeout is in milliseconds; non-positive values defer to our settings.
+                 const appTimeout = wrapper.notification.expireTimeout;
+-                if (appTimeout >= 0)
++                if (appTimeout > 0)
+                     return Math.round(appTimeout);
+                 switch (wrapper.urgency) {
+                 case NotificationUrgency.Low:

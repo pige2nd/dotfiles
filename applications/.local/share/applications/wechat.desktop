@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=WeChat
+Name[zh_CN]=微信
+Comment=WeChat Desktop through XWayland
+Exec=env QT_QPA_PLATFORM=xcb XCURSOR_THEME=Adwaita XCURSOR_SIZE=24 /usr/bin/wechat %U
+Terminal=false
+Type=Application
+Icon=wechat
+Categories=Network;InstantMessaging;
+StartupWMClass=wechat

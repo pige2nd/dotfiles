@@ -1,0 +1,3 @@
+! Qt/Fcitx candidate windows used by WeChat follow the X11 Xft DPI.
+! The internal display is 2x (3120x2080 physical, 1560x1040 logical).
+Xft.dpi: 192

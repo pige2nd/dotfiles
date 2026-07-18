@@ -1,0 +1,25 @@
+# Desktop core
+curl
+bat
+eza
+fzf
+git
+jq
+patch
+ripgrep
+starship
+stow
+zsh
+zoxide
+
+# Niri desktop
+dms
+fcitx5
+fcitx5-rime
+gnome-keyring
+network-manager-gnome
+niri
+x11-xserver-utils
+xdg-desktop-portal-gnome
+xdg-desktop-portal-gtk
+xwayland-satellite

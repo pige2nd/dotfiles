@@ -7,13 +7,20 @@ albert/
 autostart/
 bat/
 btop/
-docs/
 gtk/
-im/
 npm/
 tiling-assistant/
 tmux/
 ulauncher/
+
+# 只跟踪输入法的静态配置，不跟踪 IBus 会话状态
+im/.config/ibus/
+im/.config/fcitx5/conf/cached_layouts
+
+# docs 中原有的本机笔记仍不纳入，只开放架构与迁移文档
+docs/*
+!docs/ARCHITECTURE.md
+!docs/MIGRATION.md
 
 # 常见系统与编辑器文件
 .DS_Store

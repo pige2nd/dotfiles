@@ -1,20 +1,27 @@
 # dotfiles
 
-用于在多台电脑之间同步个人终端配置。目前维护：
+用于在多台电脑之间同步 Niri 桌面与终端配置。目前维护：
 
 - `wezterm`：WezTerm 配置、tabline 外观、快捷键和颜色
 - `zsh`：Zsh 环境、插件清单、别名、fzf、zoxide
 - `zsh/.config/starship.toml`：Starship 提示符配置
+- `niri`、`dms`：Niri 与 DMS 原生栏/桌面外壳
+- `vicinae`、`systemd`：主启动器及用户服务
+- `applications`：WeChat 的可移植 XWayland desktop 覆盖
+- `im`、`rime`、`xresources`：Fcitx5/Rime 与 XWayland 输入缩放边界
+
+架构边界见 `docs/ARCHITECTURE.md`，新机步骤见 `docs/MIGRATION.md`。
 
 ## 在新电脑上使用
 
-先安装 Git、Zsh、GNU Stow、WezTerm、Starship，以及配置中用到的
-`fzf`、`eza`、`bat` 和 `zoxide`。然后执行：
+Ubuntu 26.04 新机先按 `manifests/apt-packages.txt` 和迁移文档安装所需软件，
+克隆仓库，然后执行：
 
 ```bash
 git clone <这个仓库的地址> ~/dotfiles
 cd ~/dotfiles
 ./install.sh
+./tests/verify-desktop.sh
 ```
 
 `zsh` 首次启动时会按 `.zsh_plugins.txt` 自动安装 Antidote 插件；
@@ -34,7 +41,7 @@ git pull --rebase
 修改配置后提交并推送：
 
 ```bash
-git add wezterm zsh .gitignore README.md install.sh
+git add -A
 git commit -m "Update dotfiles"
 git push
 ```
