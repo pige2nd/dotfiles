@@ -144,6 +144,10 @@ for script in install.sh tests/verify-desktop.sh; do
   fi
 done
 
+zsh -i -c exit >/dev/null 2>&1 &&
+  pass 'interactive Zsh starts without configuration errors' ||
+  fail 'interactive Zsh reports a configuration error'
+
 if (( failures > 0 )); then
   printf '\n%d verification(s) failed.\n' "$failures" >&2
   exit 1

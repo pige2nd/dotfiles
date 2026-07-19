@@ -5,7 +5,7 @@
 # Lazy-load Zsh functions managed by this dotfiles package.
 ZFUNCDIR=${ZDOTDIR:-$HOME}/.zfunctions
 fpath=($ZFUNCDIR $fpath)
-autoload -Uz $ZFUNCDIR/*(.:t)
+autoload -Uz $ZFUNCDIR/*(N-.:t)
 
 # User style settings.
 [[ ! -f ${ZDOTDIR:-$HOME}/.zstyles ]] || source "${ZDOTDIR:-$HOME}/.zstyles"
