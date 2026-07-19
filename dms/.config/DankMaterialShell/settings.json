@@ -579,6 +579,7 @@
         "clock"
       ],
       "rightWidgets": [
+        "systemTray",
         "notificationButton",
         "battery",
         "controlCenterButton",

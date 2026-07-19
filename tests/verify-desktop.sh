@@ -41,7 +41,7 @@ if [[ -f "$dms_settings" ]]; then
   jq -e '.barConfigs[0].visible == true' "$dms_settings" >/dev/null && pass 'DMS bar is visible' || fail 'DMS bar is not visible'
   jq -e '.barConfigs[0].spacing == 0' "$dms_settings" >/dev/null && pass 'DMS bar is attached to the screen edge' || fail 'DMS bar is floating away from the screen edge'
   jq -e '.barConfigs[0].centerWidgets == ["clock"]' "$dms_settings" >/dev/null && pass 'DMS center is clock only' || fail 'DMS center has extra widgets'
-  jq -e '.barConfigs[0].rightWidgets == ["notificationButton","battery","controlCenterButton","powerMenuButton"]' "$dms_settings" >/dev/null && pass 'DMS right widgets are minimal' || fail 'DMS right widgets differ'
+  jq -e '.barConfigs[0].rightWidgets == ["systemTray","notificationButton","battery","controlCenterButton","powerMenuButton"]' "$dms_settings" >/dev/null && pass 'DMS right widgets include background-app visibility' || fail 'DMS right widgets differ'
   jq empty "$dms_settings" >/dev/null && pass 'DMS settings JSON is valid' || fail 'DMS settings JSON is invalid'
 fi
 
