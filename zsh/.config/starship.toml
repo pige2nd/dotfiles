@@ -1,13 +1,12 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Catppuccin Mocha 风格：用火箭图标标记每个新提示符的起点。
+# Catppuccin Mocha 风格：在每个新提示符前留出空行。
 palette = 'catppuccin_mocha'
 add_newline = true
 scan_timeout = 30
 command_timeout = 500
 
 format = """
-[ ](bold peach)\
 $username\
 $directory\
 $git_branch\
