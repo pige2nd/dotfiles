@@ -1,12 +1,13 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Catppuccin Mocha 风格：左侧保持简洁，右侧显示环境信息。
+# Catppuccin Mocha 风格：用火箭图标标记每个新提示符的起点。
 palette = 'catppuccin_mocha'
-add_newline = false
+add_newline = true
 scan_timeout = 30
 command_timeout = 500
 
 format = """
+[ ](bold peach)\
 $username\
 $directory\
 $git_branch\
