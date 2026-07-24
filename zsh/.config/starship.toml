@@ -1,105 +1,175 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Catppuccin Mocha 风格：在每个新提示符前留出空行。
-palette = 'catppuccin_mocha'
-add_newline = true
+# Gruvbox Rainbow，使用更柔和、低饱和度的色块。
+# 不在相邻提示符之间额外插入空白行。
+palette = 'gruvbox_muted'
+add_newline = false
 scan_timeout = 30
 command_timeout = 500
 
 format = """
+[](color_orange)\
+$os\
 $username\
+[](bg:color_yellow fg:color_orange)\
 $directory\
+[](fg:color_yellow bg:color_aqua)\
 $git_branch\
 $git_status\
-$fill\
-$python\
-$nodejs\
+[](fg:color_aqua bg:color_blue)\
+$c\
 $rust\
 $golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[](fg:color_blue bg:color_bg3)\
 $docker_context\
-$cmd_duration\
+$conda\
+[](fg:color_bg3 bg:color_bg1)\
+$time\
+[ ](fg:color_bg1)\
 $line_break\
 $character"""
 
-[palettes.catppuccin_mocha]
-blue = '#89b4fa'
-green = '#a6e3a1'
-yellow = '#f9e2af'
-red = '#f38ba8'
-mauve = '#cba6f7'
-teal = '#94e2d5'
-peach = '#fab387'
-overlay0 = '#6c7086'
+[palettes.gruvbox_muted]
+color_fg0 = '#ebdbb2'
+color_bg1 = '#3c3836'
+color_bg3 = '#504945'
+color_blue = '#56757a'
+color_aqua = '#66806b'
+color_green = '#7c7f55'
+color_orange = '#9d6542'
+color_purple = '#80647a'
+color_red = '#9c5a52'
+color_yellow = '#9d8442'
 
-[directory]
-style = 'bold blue'
-format = 'in [$path]($style) '
-truncation_length = 3
-truncate_to_repo = true
-home_symbol = '~'
-read_only = ' ro'
-read_only_style = 'red'
+[os]
+disabled = false
+style = 'bg:color_orange fg:color_fg0'
+
+[os.symbols]
+Windows = '󰍲'
+Ubuntu = '󰕈'
+SUSE = ''
+Raspbian = '󰐿'
+Mint = '󰣭'
+Macos = '󰀵'
+Manjaro = ''
+Linux = '󰌽'
+Gentoo = '󰣨'
+Fedora = '󰣛'
+Alpine = ''
+Amazon = ''
+Android = ''
+Arch = '󰣇'
+Artix = '󰣇'
+EndeavourOS = ''
+CentOS = ''
+Debian = '󰣚'
+Redhat = '󱄛'
+RedHatEnterprise = '󱄛'
+Pop = ''
 
 [username]
 show_always = true
-style_user = 'bold mauve'
-style_root = 'bold red'
-format = '[$user]($style) '
+style_user = 'bg:color_orange fg:color_fg0'
+style_root = 'bg:color_orange fg:color_fg0'
+format = '[ $user ]($style)'
+
+[directory]
+style = 'fg:color_fg0 bg:color_yellow'
+format = '[ $path ]($style)'
+truncation_length = 3
+truncation_symbol = '…/'
+
+[directory.substitutions]
+'Documents' = '󰈙 '
+'Downloads' = ' '
+'Music' = '󰝚 '
+'Pictures' = ' '
+'Developer' = '󰲋 '
 
 [git_branch]
-symbol = 'git '
-style = 'bold mauve'
-format = 'on [$symbol$branch]($style) '
+symbol = ''
+style = 'bg:color_aqua'
+format = '[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)'
 
 [git_status]
-style = 'red'
-format = '([$all_status$ahead_behind]($style) )'
-conflicted = '=${count}'
-ahead = '>${count}'
-behind = '<${count}'
-diverged = '<>${ahead_count}/${behind_count}'
-untracked = '?${count}'
-stashed = '≡${count}'
-modified = '!${count}'
-staged = '+${count}'
-renamed = 'r${count}'
-deleted = 'x${count}'
-
-[fill]
-symbol = ' '
-style = 'none'
-
-[python]
-symbol = 'py '
-style = 'yellow'
-format = 'via [$symbol$version( \($virtualenv\))]($style) '
+style = 'bg:color_aqua'
+format = '[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)'
 
 [nodejs]
-symbol = 'node '
-style = 'green'
-format = 'via [$symbol$version]($style) '
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[c]
+symbol = ' '
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [rust]
-symbol = 'rs '
-style = 'peach'
-format = 'via [$symbol$version]($style) '
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [golang]
-symbol = 'go '
-style = 'teal'
-format = 'via [$symbol$version]($style) '
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[php]
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[java]
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[kotlin]
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[haskell]
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[python]
+symbol = ''
+style = 'bg:color_blue'
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [docker_context]
-symbol = 'docker '
-style = 'blue'
-format = 'via [$symbol$context]($style) '
+symbol = ''
+style = 'bg:color_bg3'
+format = '[[ $symbol( $context) ](fg:color_fg0 bg:color_bg3)]($style)'
 
-[cmd_duration]
-min_time = 2000
-style = 'yellow'
-format = 'took [$duration]($style) '
+[conda]
+style = 'bg:color_bg3'
+format = '[[ $symbol( $environment) ](fg:color_fg0 bg:color_bg3)]($style)'
+
+[time]
+disabled = false
+time_format = '%R'
+style = 'bg:color_bg1'
+format = '[[  $time ](fg:color_fg0 bg:color_bg1)]($style)'
+
+[line_break]
+disabled = false
 
 [character]
-success_symbol = '[➜](bold green)'
-error_symbol = '[×](bold red)'
-vimcmd_symbol = '[‹](bold yellow)'
+disabled = false
+success_symbol = '[](bold fg:color_green)'
+error_symbol = '[](bold fg:color_red)'
+vimcmd_symbol = '[](bold fg:color_green)'
+vimcmd_replace_one_symbol = '[](bold fg:color_purple)'
+vimcmd_replace_symbol = '[](bold fg:color_purple)'
+vimcmd_visual_symbol = '[](bold fg:color_yellow)'
