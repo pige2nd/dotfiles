@@ -133,6 +133,14 @@ if [[ -f "$noctalia_seed" ]]; then
     rg -Fq 'scale = 1.0' "$noctalia_seed" &&
     rg -Fq 'thickness = 24' "$noctalia_seed" &&
     pass 'Noctalia bar uses the compact profile' || fail 'Noctalia bar is too thick'
+  rg -Fq 'max_length = 260' "$noctalia_seed" &&
+    rg -Fq 'title_scroll = "always"' "$noctalia_seed" &&
+    pass 'Noctalia media widget scrolls long titles within a compact width' ||
+    fail 'Noctalia media title presentation differs'
+  rg -Fq 'end = ["media", "lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]' "$noctalia_seed" &&
+    ! rg -q 'capsule_group|group:media_and_lyrics' "$noctalia_seed" &&
+    pass 'Noctalia media and lyrics use independent capsules' ||
+    fail 'Noctalia media and lyrics are forced into one capsule'
   rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]' "$noctalia_seed" &&
     pass 'Noctalia wallpaper and lyrics plugins are enabled' || fail 'Noctalia plugin selection differs'
   rg -Fq 'type = "fancy_audio_visualizer"' "$noctalia_seed" &&

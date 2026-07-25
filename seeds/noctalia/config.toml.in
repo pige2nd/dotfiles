@@ -113,6 +113,12 @@ min_length = 0
 [widget.clock]
 format = "{:%a, %d %b %H:%M}"
 
+[widget.media]
+hide_artist = true
+max_length = 260
+min_length = 80
+title_scroll = "always"
+
 [widget.tray]
 detached_panel = true
 drawer = true
