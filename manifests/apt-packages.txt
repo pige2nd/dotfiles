@@ -13,6 +13,7 @@ zsh
 zoxide
 
 # Niri desktop
+brightnessctl
 dms
 fcitx5
 fcitx5-rime
@@ -22,6 +23,7 @@ niri
 x11-xserver-utils
 xdg-desktop-portal-gnome
 xdg-desktop-portal-gtk
+wireplumber
 xwayland-satellite
 
 # NyxNiri session (Noctalia uses its documented Ubuntu 26.04 repository;

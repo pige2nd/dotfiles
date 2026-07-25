@@ -4,6 +4,7 @@ set -euo pipefail
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 seed="$repo_dir/seeds/noctalia/config.toml.in"
 prefetch="$repo_dir/scripts/prefetch-noctalia-plugins.sh"
+migrate_status="$repo_dir/scripts/configure-noctalia-status-carousel.sh"
 lyrics_patch="$repo_dir/patches/noctalia-lyrics-posix.patch"
 require_runtime=false
 if [[ ${1:-} == --runtime ]]; then
@@ -13,7 +14,8 @@ elif [[ $# -gt 0 ]]; then
   exit 2
 fi
 
-rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]' "$seed"
+rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics", "xx/status-carousel"]' "$seed"
+rg -Fxq 'middle_click_opens_widget_settings = false' "$seed"
 rg -Fq 'type = "noctalia/mpvpaper:mpvpaper"' "$seed"
 rg -Fq 'type = "h465855hgg/lyrics:lyrics"' "$seed"
 rg -Fq 'type = "fancy_audio_visualizer"' "$seed"
@@ -21,6 +23,7 @@ rg -Fq 'ui_scale = 1.2' "$seed"
 rg -Fq 'telemetry_enabled = false' "$seed"
 
 bash -n "$prefetch"
+bash -n "$migrate_status"
 rg -Fq 'git clone --filter=blob:none --no-checkout "$url" "$repo_dir"' "$prefetch"
 rg -Fq 'NOCTALIA_MPV_PAPER_COMPAT_REV:-487c0288adf0d1e6f72ba96e9e2499596521249c' "$prefetch"
 rg -Fq 'noctalia msg plugins update official' "$prefetch"
@@ -31,6 +34,32 @@ rg -Fq 'transitionElapsed = transitionElapsed + delta * 1000' "$lyrics_patch"
 
 test_root=$(mktemp -d)
 trap 'rm -rf -- "$test_root"' EXIT
+
+run_status_migration() {
+  NOCTALIA_CONFIG_FILE="$1" \
+    NOCTALIA_ENABLE_PLUGIN_IPC=false \
+    "$migrate_status" >/dev/null
+}
+
+missing_setting_config="$test_root/missing-middle-click.toml"
+cp "$seed" "$missing_setting_config"
+sed -i '/^middle_click_opens_widget_settings = false$/d' "$missing_setting_config"
+run_status_migration "$missing_setting_config"
+rg -Fxq 'middle_click_opens_widget_settings = false' "$missing_setting_config"
+test "$(rg -c '^middle_click_opens_widget_settings[[:space:]]*=' "$missing_setting_config")" -eq 1
+missing_setting_hash=$(sha256sum "$missing_setting_config")
+run_status_migration "$missing_setting_config"
+test "$missing_setting_hash" = "$(sha256sum "$missing_setting_config")"
+
+true_setting_config="$test_root/true-middle-click.toml"
+cp "$seed" "$true_setting_config"
+sed -i \
+  's/^middle_click_opens_widget_settings = false$/middle_click_opens_widget_settings = true/' \
+  "$true_setting_config"
+run_status_migration "$true_setting_config"
+rg -Fxq 'middle_click_opens_widget_settings = false' "$true_setting_config"
+! rg -Fxq 'middle_click_opens_widget_settings = true' "$true_setting_config"
+
 official_fixture="$test_root/official"
 community_fixture="$test_root/community"
 fake_bin="$test_root/bin"
@@ -91,6 +120,7 @@ if noctalia msg plugins source list >/dev/null 2>&1; then
   validation=$(noctalia config validate 2>&1)
   rg -q '^noctalia/mpvpaper .* enabled( |$)' <<<"$plugins"
   rg -q '^h465855hgg/lyrics .* enabled( |$)' <<<"$plugins"
+  rg -q '^xx/status-carousel .* enabled( |$)' <<<"$plugins"
   if rg -q '^noctalia/mpvpaper .* incompatible( |$)' <<<"$plugins"; then
     # The catalog may advertise an API-newer update. The loaded compatible
     # export must still make the active config warning-free.

@@ -62,6 +62,8 @@ else
   printf '保留已有 Noctalia 配置：%s\n' "$noctalia_target/config.toml"
 fi
 
+"$repo_dir/scripts/configure-noctalia-status-carousel.sh"
+
 # DMS rewrites settings.json at runtime, so install a copy rather than a Stow
 # symlink. The repository remains the reproducible seed, not runtime state.
 dms_source="$repo_dir/dms/.config/DankMaterialShell/settings.json"

@@ -1,0 +1,53 @@
+#!/bin/sh
+set -eu
+
+action=${1:-}
+item=${2:-}
+
+read_volume() {
+  wpctl_command=${NYXNIRI_WPCTL:-wpctl}
+  output=$(LC_ALL=C "$wpctl_command" get-volume @DEFAULT_AUDIO_SINK@)
+  value=$(printf '%s\n' "$output" | awk '{ printf "%.0f", $2 * 100 }')
+  case "$output" in
+    *'[MUTED]'*) state=muted ;;
+    *) state=active ;;
+  esac
+  printf 'volume|%s|%s\n' "$value" "$state"
+}
+
+read_brightness() {
+  brightnessctl_command=${NYXNIRI_BRIGHTNESSCTL:-brightnessctl}
+  output=$(LC_ALL=C "$brightnessctl_command" -m)
+  value=$(printf '%s\n' "$output" | awk -F, 'NR == 1 { gsub(/%/, "", $4); print $4 }')
+  test -n "$value"
+  printf 'brightness|%s|active\n' "$value"
+}
+
+read_battery() {
+  power_supply_root=${NYXNIRI_POWER_SUPPLY_ROOT:-/sys/class/power_supply}
+  for device_dir in "$power_supply_root"/*; do
+    test -d "$device_dir" || continue
+    test -r "$device_dir/type" || continue
+    test "$(cat "$device_dir/type")" = Battery || continue
+    if test -r "$device_dir/present" && test "$(cat "$device_dir/present")" != 1; then
+      continue
+    fi
+    test -r "$device_dir/capacity" || continue
+    value=$(cat "$device_dir/capacity")
+    if test -r "$device_dir/status"; then
+      state=$(cat "$device_dir/status")
+    else
+      state=Unknown
+    fi
+    printf 'battery|%s|%s\n' "$value" "$state"
+    return 0
+  done
+  return 2
+}
+
+case "$action:$item" in
+  read:volume) read_volume ;;
+  read:brightness) read_brightness ;;
+  read:battery) read_battery ;;
+  *) printf 'usage: %s read {battery|volume|brightness}\n' "$0" >&2; exit 2 ;;
+esac

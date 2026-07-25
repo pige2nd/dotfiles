@@ -1,0 +1,32 @@
+id = "xx/status-carousel"
+name = "Status Carousel"
+version = "1.0.0"
+plugin_api = 3
+author = "xx"
+license = "MIT"
+icon = "carousel-horizontal"
+description = "Cycles battery, volume, and brightness in one bar capsule."
+tags = ["bar", "system", "status"]
+dependencies = ["brightnessctl", "wpctl"]
+
+[[widget]]
+id = "status"
+entry = "widget.luau"
+
+  [[widget.setting]]
+  key = "cycle_seconds"
+  type = "int"
+  label_key = "settings.cycle_seconds.label"
+  description_key = "settings.cycle_seconds.description"
+  default = 4
+  min = 2
+  max = 30
+
+  [[widget.setting]]
+  key = "adjust_step"
+  type = "int"
+  label_key = "settings.adjust_step.label"
+  description_key = "settings.adjust_step.description"
+  default = 5
+  min = 1
+  max = 25

@@ -23,8 +23,12 @@ required_files=(
   noctalia/.config/noctalia/theme-sync.sh
   noctalia/.config/noctalia/wallpaper-hook.sh
   noctalia/.config/noctalia/mpv-hook.lua
+  noctalia/.local/share/noctalia/plugins/status-carousel/plugin.toml
+  noctalia/.local/share/noctalia/plugins/status-carousel/widget.luau
+  noctalia/.local/share/noctalia/plugins/status-carousel/status-carousel
   session/.local/bin/niri-nyxniri-session
   session-files/niri-nyxniri.desktop
+  scripts/configure-noctalia-status-carousel.sh
   scripts/install-nyxniri-system.sh
   scripts/install-nyxniri-deps.sh
   scripts/prefetch-noctalia-plugins.sh
@@ -49,7 +53,7 @@ required_files=(
 
 for path in "${required_files[@]}"; do require_file "$path"; done
 
-required_commands=(dms fcitx5 ffmpeg jq mpv mpvpaper niri noctalia patch playerctl rg stow systemctl vicinae wechat wezterm)
+required_commands=(brightnessctl dms fcitx5 ffmpeg jq mpv mpvpaper niri noctalia patch playerctl rg stow systemctl vicinae wechat wezterm wpctl)
 for command_name in "${required_commands[@]}"; do
   command -v "$command_name" >/dev/null 2>&1 &&
     pass "$command_name is installed" || fail "$command_name is missing"
@@ -142,13 +146,16 @@ if [[ -f "$noctalia_seed" ]]; then
     fail 'Noctalia RAM utilization capsule is missing or too wide'
   rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
     pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
-  rg -Fq 'end = ["lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]' "$noctalia_seed" &&
+  rg -Fq 'end = ["lyrics", "tray", "wallpaper", "mpvpaper", "status-carousel", "notifications", "session"]' "$noctalia_seed" &&
+    rg -Fq '[widget.status-carousel]' "$noctalia_seed" &&
+    rg -Fq 'type = "xx/status-carousel:status"' "$noctalia_seed" &&
     rg -Fq 'max_chars = 10' "$noctalia_seed" &&
     ! rg -q 'capsule_group|group:media_and_lyrics' "$noctalia_seed" &&
-    pass 'Noctalia uses one compact lyrics and track capsule' ||
-    fail 'Noctalia media presentation is duplicated or too wide'
-  rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]' "$noctalia_seed" &&
-    pass 'Noctalia wallpaper and lyrics plugins are enabled' || fail 'Noctalia plugin selection differs'
+    pass 'Noctalia uses compact media and rotating status capsules' ||
+    fail 'Noctalia media or status presentation differs'
+  rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics", "xx/status-carousel"]' "$noctalia_seed" &&
+    rg -Fxq 'middle_click_opens_widget_settings = false' "$noctalia_seed" &&
+    pass 'Noctalia wallpaper, lyrics, and status plugins are enabled' || fail 'Noctalia plugin selection differs'
   rg -Fq 'type = "fancy_audio_visualizer"' "$noctalia_seed" &&
     pass 'Noctalia desktop audio visualizer is enabled' || fail 'Noctalia desktop audio visualizer is disabled'
   rg -Fq 'ui_scale = 1.2' "$noctalia_seed" &&
@@ -361,6 +368,7 @@ for script in \
   install.sh \
   scripts/install-nyxniri-system.sh \
   scripts/install-nyxniri-deps.sh \
+  scripts/configure-noctalia-status-carousel.sh \
   scripts/prefetch-noctalia-plugins.sh \
   scripts/install-nyxniri-wallpapers.sh \
   session/.local/bin/niri-nyxniri-session \

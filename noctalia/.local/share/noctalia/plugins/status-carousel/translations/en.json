@@ -1,0 +1,18 @@
+{
+  "item.battery": "Battery",
+  "item.volume": "Volume",
+  "item.brightness": "Brightness",
+  "state.active": "active",
+  "state.muted": "muted",
+  "state.Charging": "charging",
+  "state.Discharging": "discharging",
+  "state.Full": "full",
+  "state.Not charging": "not charging",
+  "state.Unknown": "unknown",
+  "tooltip.status": "{item}: {value}% · {state}",
+  "tooltip.unavailable": "{item}: unavailable",
+  "settings.cycle_seconds.label": "Carousel interval",
+  "settings.cycle_seconds.description": "Seconds before showing the next status.",
+  "settings.adjust_step.label": "Adjustment step",
+  "settings.adjust_step.description": "Percentage changed by each wheel step."
+}

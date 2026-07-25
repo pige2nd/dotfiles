@@ -1,0 +1,18 @@
+{
+  "item.battery": "电量",
+  "item.volume": "音量",
+  "item.brightness": "亮度",
+  "state.active": "正常",
+  "state.muted": "已静音",
+  "state.Charging": "充电中",
+  "state.Discharging": "放电中",
+  "state.Full": "已充满",
+  "state.Not charging": "未充电",
+  "state.Unknown": "未知",
+  "tooltip.status": "{item}：{value}% · {state}",
+  "tooltip.unavailable": "{item}：不可用",
+  "settings.cycle_seconds.label": "轮播间隔",
+  "settings.cycle_seconds.description": "切换到下一项状态前等待的秒数。",
+  "settings.adjust_step.label": "调节步长",
+  "settings.adjust_step.description": "每格滚轮改变的百分比。"
+}

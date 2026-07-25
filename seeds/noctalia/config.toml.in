@@ -30,7 +30,7 @@ scale = 1.1
 shadow = false
 start = ["vicinae-launcher", "workspaces", "active_window", "ram"]
 center = ["clock"]
-end = ["lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
+end = ["lyrics", "tray", "wallpaper", "mpvpaper", "status-carousel", "notifications", "session"]
 thickness = 36
 
 [brightness]
@@ -79,6 +79,7 @@ position = "bottom_center"
 scale = 0.9
 
 [shell]
+middle_click_opens_widget_settings = false
 font_family = "Noto Sans CJK SC"
 settings_show_advanced = true
 telemetry_enabled = false
@@ -105,7 +106,7 @@ directory = "@WALLPAPER_DIR@"
 fill_mode = "crop"
 
 [plugins]
-enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]
+enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics", "xx/status-carousel"]
 
 [widget.active_window]
 min_length = 0
@@ -131,6 +132,11 @@ stat = "ram_pct"
 display = "text"
 show_label = true
 label_min_width = 0
+
+[widget.status-carousel]
+type = "xx/status-carousel:status"
+cycle_seconds = 4
+adjust_step = 5
 
 [widget.tray]
 detached_panel = true
