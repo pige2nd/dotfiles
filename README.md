@@ -6,6 +6,7 @@
 - `zsh`：Zsh 环境、插件清单、别名、fzf、zoxide
 - `zsh/.config/starship.toml`：Starship 提示符配置
 - `niri`、`dms`：Niri 与 DMS 原生栏/桌面外壳
+- `niri/nyxniri`：从 NyxNiri 移植的动画、透明模糊、窗口规则与护眼模式
 - `vicinae`、`systemd`：主启动器及用户服务
 - `applications`：WeChat 的可移植 XWayland desktop 覆盖
 - `im`、`rime`、`xresources`：Fcitx5/Rime 与 XWayland 输入缩放边界
@@ -26,6 +27,11 @@ cd ~/dotfiles
 
 `zsh` 首次启动时会按 `.zsh_plugins.txt` 自动安装 Antidote 插件；
 WezTerm 首次加载时会自动获取 `tabline.wez` 插件。
+
+登录 Niri 后可按 `Super+Ctrl+N` 切换护眼模式。它会联动 DMS 夜间色温，
+并在“不透明、无模糊”和默认视觉效果之间切换；`Super+N` 仍是 DMS 通知中心。
+顶部 Bar 将 NyxNiri V2 的左/中/右格局映射为 DMS 原生组件，并使用透明胶囊样式；
+Noctalia 专属控件仍由现有 DMS 壁纸与控制中心功能承载。
 
 如果目标路径已有同名文件，Stow 会停止并提示冲突。确认备份后再处理，
 不要直接覆盖未知配置。

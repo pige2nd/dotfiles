@@ -15,6 +15,14 @@ cd "$repo_dir"
 # Vicinae, Rime and desktop applications may create sibling files later.
 stow --no-folding --restow "${packages[@]}"
 
+# The active NyxNiri effect is runtime state. Keep the switchable symlink out
+# of Git so eye-care toggles never write back into the Stow-managed repository.
+nyxniri_dir="$HOME/.config/niri/nyxniri"
+effects_link="$nyxniri_dir/effects.kdl"
+if [[ ! -e "$effects_link" && ! -L "$effects_link" ]]; then
+  ln -s effects_normal.kdl "$effects_link"
+fi
+
 # DMS rewrites settings.json at runtime, so install a copy rather than a Stow
 # symlink. The repository remains the reproducible seed, not runtime state.
 dms_source="$repo_dir/dms/.config/DankMaterialShell/settings.json"
@@ -42,6 +50,9 @@ systemctl --user enable --now dms.service
 # DMS owns Niri's generated bind file. Store the override through its CLI.
 dms keybinds set niri Mod+Space 'spawn vicinae toggle' \
   --desc 'Vicinae Launcher'
+dms keybinds set niri Mod+Ctrl+N \
+  'spawn ~/.config/niri/nyxniri/toggle-eyecare.sh' \
+  --desc 'Toggle Eye-care Mode'
 
 # Waybar may stay installed as an emergency fallback, but is not active.
 if systemctl --user list-unit-files waybar.service --no-legend 2>/dev/null | grep -q '^waybar.service'; then

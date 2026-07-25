@@ -1,0 +1,28 @@
+// Keep video and game surfaces fully opaque for clarity and performance.
+window-rule {
+    match app-id=r"^steam_app_.*"
+    match app-id=r"^gamescope$"
+    match app-id=r"^wine$"
+
+    opacity 1.0
+    background-effect {
+        blur false
+    }
+}
+
+window-rule {
+    match app-id=r"^mpv$"
+    match app-id=r"^vlc$"
+    match app-id=r"^org\.kde\.kdenlive$"
+
+    opacity 1.0
+}
+
+// Normalize common browser picture-in-picture windows without changing browsers.
+window-rule {
+    match title=r"^(Picture-in-Picture|画中画)$"
+
+    open-floating true
+    opacity 1.0
+    default-floating-position x=20 y=20 relative-to="bottom-right"
+}

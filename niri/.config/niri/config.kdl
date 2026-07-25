@@ -45,3 +45,10 @@ include "dms/colors.kdl"
 include "dms/layout.kdl"
 include "dms/alttab.kdl"
 include "dms/binds.kdl"
+
+// NyxNiri-inspired additions live outside DMS-generated files so DMS updates
+// cannot overwrite them. The active effect file is a runtime symlink managed
+// by toggle-eyecare.sh.
+include "nyxniri/visuals.kdl"
+include "nyxniri/effects.kdl"
+include "nyxniri/window-rules.kdl"

@@ -1,0 +1,22 @@
+// Normal mode: restrained transparency with efficient wallpaper-only blur.
+
+window-rule {
+    opacity 0.96
+
+    background-effect {
+        blur true
+        xray true
+    }
+}
+
+window-rule {
+    match is-focused=false
+    opacity 0.92
+}
+
+blur {
+    passes 3
+    offset 2.3
+    noise 0.001
+    saturation 1.25
+}

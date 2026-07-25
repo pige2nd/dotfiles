@@ -13,6 +13,11 @@ require_file() {
 
 required_files=(
   niri/.config/niri/config.kdl
+  niri/.config/niri/nyxniri/effects_eyecare.kdl
+  niri/.config/niri/nyxniri/effects_normal.kdl
+  niri/.config/niri/nyxniri/toggle-eyecare.sh
+  niri/.config/niri/nyxniri/visuals.kdl
+  niri/.config/niri/nyxniri/window-rules.kdl
   dms/.config/DankMaterialShell/settings.json
   vicinae/.config/vicinae/settings.json
   xresources/.Xresources
@@ -39,9 +44,13 @@ done
 dms_settings="$repo_dir/dms/.config/DankMaterialShell/settings.json"
 if [[ -f "$dms_settings" ]]; then
   jq -e '.barConfigs[0].visible == true' "$dms_settings" >/dev/null && pass 'DMS bar is visible' || fail 'DMS bar is not visible'
-  jq -e '.barConfigs[0].spacing == 0' "$dms_settings" >/dev/null && pass 'DMS bar is attached to the screen edge' || fail 'DMS bar is floating away from the screen edge'
+  jq -e '[.barConfigs[0].leftWidgets[] | if type == "string" then . else select(.enabled != false) | .id end] == ["launcherButton","workspaceSwitcher","focusedWindow"]' "$dms_settings" >/dev/null &&
+    pass 'DMS left bar matches the NyxNiri layout' || fail 'DMS left bar differs from the NyxNiri layout'
   jq -e '.barConfigs[0].centerWidgets == ["clock"]' "$dms_settings" >/dev/null && pass 'DMS center is clock only' || fail 'DMS center has extra widgets'
-  jq -e '.barConfigs[0].rightWidgets == ["systemTray","notificationButton","battery","controlCenterButton","powerMenuButton"]' "$dms_settings" >/dev/null && pass 'DMS right widgets include background-app visibility' || fail 'DMS right widgets differ'
+  jq -e '.barConfigs[0].rightWidgets == ["music","systemTray","notificationButton","battery","controlCenterButton","powerMenuButton"]' "$dms_settings" >/dev/null &&
+    pass 'DMS right bar matches the NyxNiri layout' || fail 'DMS right bar differs from the NyxNiri layout'
+  jq -e '.barConfigs[0] | .transparency == 0 and .widgetTransparency == 0.8 and .spacing == 4 and .widgetOutlineEnabled == true' "$dms_settings" >/dev/null &&
+    pass 'DMS bar uses NyxNiri floating capsules' || fail 'DMS bar capsule styling differs'
   jq empty "$dms_settings" >/dev/null && pass 'DMS settings JSON is valid' || fail 'DMS settings JSON is invalid'
 fi
 
@@ -52,16 +61,54 @@ fi
 
 niri_config="$repo_dir/niri/.config/niri/config.kdl"
 if [[ -f "$niri_config" ]] && command -v niri >/dev/null 2>&1; then
-  if [[ -d "$HOME/.config/niri/dms" ]]; then
+  if [[ -d "$HOME/.config/niri/dms" && -d "$HOME/.config/niri/nyxniri" ]]; then
     validate_dir=$(mktemp -d)
     cp "$niri_config" "$validate_dir/config.kdl"
     ln -s "$HOME/.config/niri/dms" "$validate_dir/dms"
+    ln -s "$HOME/.config/niri/nyxniri" "$validate_dir/nyxniri"
     niri validate -c "$validate_dir/config.kdl" >/dev/null &&
       pass 'Niri config is valid' || fail 'Niri config is invalid'
     rm -rf "$validate_dir"
   else
-    fail 'DMS-generated Niri includes are missing'
+    fail 'DMS-generated or NyxNiri Niri includes are missing'
   fi
+fi
+
+if [[ -f "$niri_config" ]]; then
+  for include_path in \
+    nyxniri/visuals.kdl \
+    nyxniri/effects.kdl \
+    nyxniri/window-rules.kdl; do
+    rg -q "include \"$include_path\"" "$niri_config" &&
+      pass "Niri includes $include_path" ||
+      fail "Niri does not include $include_path"
+  done
+fi
+
+rg -q "dms keybinds set niri Mod\\+Ctrl\\+N" "$repo_dir/install.sh" &&
+  pass 'NyxNiri eye-care bind is delegated to DMS' ||
+  fail 'NyxNiri eye-care bind is not delegated to DMS'
+
+if rg -n 'noctalia|kitty|fish|mpvpaper' \
+  "$repo_dir/niri/.config/niri/nyxniri" 2>/dev/null; then
+  fail 'NyxNiri integration replaces an existing desktop component'
+else
+  pass 'NyxNiri integration keeps DMS, Vicinae, WezTerm and Zsh'
+fi
+
+effects_link="$HOME/.config/niri/nyxniri/effects.kdl"
+if [[ -L "$effects_link" ]]; then
+  effects_target=$(readlink "$effects_link")
+  case "$effects_target" in
+    effects_normal.kdl|effects_eyecare.kdl)
+      pass "NyxNiri runtime effect selects $effects_target"
+      ;;
+    *)
+      fail "NyxNiri runtime effect has unexpected target: $effects_target"
+      ;;
+  esac
+else
+  fail 'NyxNiri runtime effect selector is not a symlink'
 fi
 
 if command -v rg >/dev/null 2>&1; then
@@ -93,6 +140,9 @@ generated_binds="$HOME/.config/niri/dms/binds.kdl"
 if [[ -f "$generated_binds" ]]; then
   rg -q 'spawn "vicinae" "toggle"' "$generated_binds" &&
     pass 'Super+Space launches Vicinae' || fail 'Vicinae keybind is missing'
+  rg -q 'Mod\+Ctrl\+N.*Toggle Eye-care Mode.*toggle-eyecare\.sh' "$generated_binds" &&
+    pass 'Super+Ctrl+N toggles NyxNiri eye-care mode' ||
+    fail 'NyxNiri eye-care keybind is missing'
 else
   fail 'DMS-generated Niri keybinds are missing'
 fi
@@ -109,6 +159,7 @@ dms_runtime="$HOME/.config/DankMaterialShell/settings.json"
 managed_links=(
   .Xresources
   .config/niri/config.kdl
+  .config/niri/nyxniri/visuals.kdl
   .config/systemd/user/vicinae.service
   .config/vicinae/settings.json
   .config/wezterm/wezterm.lua
@@ -138,11 +189,21 @@ case "$waybar_state" in
   *) fail "Waybar has an unexpected enablement state: $waybar_state" ;;
 esac
 
-for script in install.sh tests/verify-desktop.sh; do
+for script in \
+  install.sh \
+  tests/verify-desktop.sh \
+  tests/test-toggle-eyecare.sh \
+  niri/.config/niri/nyxniri/toggle-eyecare.sh; do
   if [[ -f "$repo_dir/$script" ]]; then
     bash -n "$repo_dir/$script" && pass "$script syntax" || fail "$script syntax"
   fi
 done
+
+if "$repo_dir/tests/test-toggle-eyecare.sh" >/dev/null; then
+  pass 'NyxNiri eye-care state transitions'
+else
+  fail 'NyxNiri eye-care state transitions'
+fi
 
 zsh -i -c exit >/dev/null 2>&1 &&
   pass 'interactive Zsh starts without configuration errors' ||
