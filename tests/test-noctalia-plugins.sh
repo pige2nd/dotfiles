@@ -4,6 +4,7 @@ set -euo pipefail
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 seed="$repo_dir/seeds/noctalia/config.toml.in"
 prefetch="$repo_dir/scripts/prefetch-noctalia-plugins.sh"
+lyrics_patch="$repo_dir/patches/noctalia-lyrics-posix.patch"
 require_runtime=false
 if [[ ${1:-} == --runtime ]]; then
   require_runtime=true
@@ -24,6 +25,9 @@ rg -Fq 'git clone --filter=blob:none --no-checkout "$url" "$repo_dir"' "$prefetc
 rg -Fq 'NOCTALIA_MPV_PAPER_COMPAT_REV:-487c0288adf0d1e6f72ba96e9e2499596521249c' "$prefetch"
 rg -Fq 'noctalia msg plugins update official' "$prefetch"
 rg -Fq 'noctalia msg plugins update community' "$prefetch"
+rg -Fq 'patch_lyrics_plugin' "$prefetch"
+rg -Fq 'local fieldSeparator = string.char(31)' "$lyrics_patch"
+rg -Fq 'transitionElapsed = transitionElapsed + delta * 1000' "$lyrics_patch"
 
 test_root=$(mktemp -d)
 trap 'rm -rf -- "$test_root"' EXIT

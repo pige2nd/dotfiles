@@ -2,6 +2,7 @@
 set -euo pipefail
 
 state_home=${NOCTALIA_STATE_HOME:-${XDG_STATE_HOME:-"$HOME/.local/state"}}
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 sources_dir="$state_home/noctalia/plugins/sources"
 materialized_dir="$state_home/noctalia/plugins/materialized"
 official_url=${NOCTALIA_OFFICIAL_PLUGINS_URL:-https://github.com/noctalia-dev/official-plugins}
@@ -12,6 +13,22 @@ backup_target=
 clone_recovery_dir=
 clone_recovery_target=
 mpvpaper_target=
+
+patch_lyrics_plugin() {
+  local lyrics_target="$materialized_dir/community/lyrics"
+  local lyrics_patch="$repo_dir/patches/noctalia-lyrics-posix.patch"
+
+  [[ -f "$lyrics_target/lyrics_service.luau" && -f "$lyrics_target/lyrics.luau" ]] || return 0
+  if rg -Fq 'local fieldSeparator = string.char(31)' "$lyrics_target/lyrics_service.luau" &&
+      rg -Fq 'transitionElapsed = transitionElapsed + delta * 1000' "$lyrics_target/lyrics.luau" &&
+      ! sed -n '/if playing then/,+2p' "$lyrics_target/lyrics.luau" |
+        rg -Fq 'transitionElapsed = transitionElapsed + delta * 1000'; then
+    return 0
+  fi
+
+  patch --batch --forward -p1 -d "$lyrics_target" <"$lyrics_patch"
+  printf '%s\n' '已应用歌词插件的 POSIX shell 与暂停动画兼容补丁。'
+}
 
 cleanup_staging() {
   if [[ -n "$backup_target" && -e "$backup_target" ]]; then
@@ -133,5 +150,11 @@ if noctalia msg plugins source list >/dev/null 2>&1; then
   noctalia msg config-reload
   noctalia msg plugins update official
   noctalia msg plugins update community
+  # Source updates are asynchronous, but the repositories were fetched above;
+  # give Noctalia time to export the local revision before patching that copy.
+  sleep 2
+  patch_lyrics_plugin
   printf '%s\n' '已通知运行中的 Noctalia 刷新插件源。'
+else
+  patch_lyrics_plugin
 fi

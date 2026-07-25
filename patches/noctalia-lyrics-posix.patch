@@ -1,0 +1,33 @@
+--- a/lyrics_service.luau
++++ b/lyrics_service.luau
+@@ -746,7 +746,15 @@
+ local function poll()
+   if pollInFlight then return end
+   pollInFlight = true
+-  local cmd = [[playerctl --all-players metadata --format $'{{playerInstance}}\x1f{{playerName}}\x1f{{lc(status)}}\x1f{{title}}\x1f{{artist}}\x1f{{album}}\x1f{{position}}\x1f{{mpris:length}}\x1f{{mpris:artUrl}}\x1f{{mpris:trackid}}\x1f{{xesam:url}}\x1f{{xesam:asText}}\x1e' 2>/dev/null]]
++  local fieldSeparator = string.char(31)
++  local recordSeparator = string.char(30)
++  local format = table.concat({
++    "{{playerInstance}}", "{{playerName}}", "{{lc(status)}}", "{{title}}",
++    "{{artist}}", "{{album}}", "{{position}}", "{{mpris:length}}",
++    "{{mpris:artUrl}}", "{{mpris:trackid}}", "{{xesam:url}}",
++    "{{xesam:asText}}",
++  }, fieldSeparator) .. recordSeparator
++  local cmd = "playerctl --all-players metadata --format " .. shellQuote(format) .. " 2>/dev/null"
+-
++
+   local started = noctalia.runAsync(cmd, function(r)
+     pollInFlight = false
+--- a/lyrics.luau
++++ b/lyrics.luau
+@@ -616,8 +616,8 @@
+   end
+   displayedLine = info and info.line or nil
+-
++
++  transitionElapsed = transitionElapsed + delta * 1000
+   if playing then
+-    transitionElapsed = transitionElapsed + delta * 1000
+     local text = showMode == "track" and getTrackLabel() or (info and info.line.text or "")
+     local secondary = showMode ~= "track" and info and secondaryText(info.line) or ""
+     if shouldMarquee(text) or (secondary ~= "" and shouldMarquee(secondary)) then

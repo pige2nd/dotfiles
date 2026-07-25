@@ -30,7 +30,7 @@ scale = 1.1
 shadow = false
 start = ["launcher", "workspaces", "active_window"]
 center = ["clock"]
-end = ["media", "lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
+end = ["lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
 thickness = 36
 
 [brightness]
@@ -139,5 +139,6 @@ display_mode = "toggle"
 double_line = true
 karaoke_enabled = true
 lyrics_source = "auto"
+max_chars = 10
 show_translation = true
 translation_language = "zh-Hans"
