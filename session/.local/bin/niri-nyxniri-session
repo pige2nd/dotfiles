@@ -12,6 +12,7 @@ restore_dms() {
   ln -sfn effects_normal.kdl "$effects_link"
   systemctl --user unset-environment \
     NIRI_CONFIG XDG_SESSION_DESKTOP DESKTOP_SESSION >/dev/null 2>&1 || true
+  systemctl --user unmask --runtime dms.service >/dev/null 2>&1 || true
   systemctl --user start dms.service >/dev/null 2>&1 || true
 }
 trap restore_dms EXIT HUP INT TERM
@@ -31,8 +32,8 @@ if [[ -f "$state_file" ]]; then
 fi
 ln -sfn effects_normal.kdl "$effects_link"
 
-if ! systemctl --user stop dms.service; then
-  printf '%s\n' 'NyxNiri: 无法停止 DMS，已取消启动以避免两个桌面 Shell 冲突。' >&2
+if ! systemctl --user mask --runtime --now dms.service; then
+  printf '%s\n' 'NyxNiri: 无法临时屏蔽 DMS，已取消启动以避免两个桌面 Shell 冲突。' >&2
   exit 1
 fi
 

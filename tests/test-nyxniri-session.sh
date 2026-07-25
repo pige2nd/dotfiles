@@ -17,7 +17,7 @@ printf '%s\n' disabled >"$test_home/.local/state/niri/nyxniri-eyecare"
 cat >"$mock_bin/systemctl" <<'EOF'
 #!/usr/bin/env bash
 printf 'systemctl %s\n' "$*" >>"$MOCK_LOG"
-if [[ "$*" == '--user stop dms.service' && "${MOCK_STOP_FAIL:-0}" == 1 ]]; then
+if [[ "$*" == '--user mask --runtime --now dms.service' && "${MOCK_MASK_FAIL:-0}" == 1 ]]; then
   exit 1
 fi
 EOF
@@ -47,15 +47,16 @@ wrapper_status=$?
 set -e
 [[ "$wrapper_status" == 7 ]]
 grep -Fxq 'dms ipc call night disable' "$mock_log"
-grep -Fxq 'systemctl --user stop dms.service' "$mock_log"
+grep -Fxq 'systemctl --user mask --runtime --now dms.service' "$mock_log"
 grep -Fq "niri-session NIRI_CONFIG=$test_home/.config/niri-nyxniri/config.kdl DESKTOP_SESSION=NyxNiri" "$mock_log"
 grep -Fxq 'systemctl --user unset-environment NIRI_CONFIG XDG_SESSION_DESKTOP DESKTOP_SESSION' "$mock_log"
+grep -Fxq 'systemctl --user unmask --runtime dms.service' "$mock_log"
 [[ $(tail -n 1 "$mock_log") == 'systemctl --user start dms.service' ]]
 [[ $(readlink "$test_home/.config/niri/nyxniri/effects.kdl") == effects_normal.kdl ]]
 [[ ! -e "$test_home/.local/state/niri/nyxniri-eyecare" ]]
 
 : >"$mock_log"
-MOCK_STOP_FAIL=1 "$wrapper" >/dev/null 2>&1 && exit 1
+MOCK_MASK_FAIL=1 "$wrapper" >/dev/null 2>&1 && exit 1
 if grep -q '^niri-session ' "$mock_log"; then
   printf '%s\n' 'NyxNiri started even though DMS could not be stopped.' >&2
   exit 1

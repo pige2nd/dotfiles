@@ -6,7 +6,7 @@
 
 - Niri 负责合成、平铺、列布局和工作区；接受它的原生模型，不实现“假最小化”。
 - 普通 `Niri` 登录会话仍以 DMS 作为唯一桌面外壳：原生栏、控制中心、通知、设置、锁屏、壁纸和剪贴板。
-- 独立 `NyxNiri` 登录会话以 Noctalia V5 替换 Bar、Dock、通知、控制中心、锁屏和壁纸系统；进入时停止 DMS，退出时恢复 DMS。
+- 独立 `NyxNiri` 登录会话以 Noctalia V5 替换 Bar、Dock、通知、控制中心、锁屏和壁纸系统；进入时仅在本次用户运行时 mask 并停止 DMS，防止 `graphical-session.target` 将它重新拉起，退出时解除 mask 并恢复 DMS。
 - 两个会话复用动画、阴影、透明模糊、护眼模式和窗口规则，但使用不同的 Niri 主配置；护眼脚本按当前会话调用 DMS 或 Noctalia 的夜间模式。
 - 每个会话只有一条 Shell 栏：普通 Niri 使用 DMS，NyxNiri 使用 Noctalia；Waybar 不运行。
 - Vicinae 是唯一键盘主启动器，Super+Space 打开；DMS 栏上的按钮保留为鼠标备用抽屉，不绑定快捷键。

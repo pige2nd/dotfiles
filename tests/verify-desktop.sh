@@ -137,16 +137,16 @@ fi
 
 session_wrapper="$repo_dir/session/.local/bin/niri-nyxniri-session"
 if [[ -f "$session_wrapper" ]]; then
-  rg -q 'systemctl --user stop dms.service' "$session_wrapper" &&
-    pass 'NyxNiri stops DMS at session entry' || fail 'NyxNiri does not isolate DMS'
+  rg -Fq 'systemctl --user mask --runtime --now dms.service' "$session_wrapper" &&
+    pass 'NyxNiri runtime-masks DMS at session entry' || fail 'NyxNiri does not isolate DMS'
   rg -q 'systemctl --user start dms.service' "$session_wrapper" &&
     pass 'NyxNiri restores DMS at session exit' || fail 'NyxNiri does not restore DMS'
   rg -q 'systemctl --user unset-environment' "$session_wrapper" &&
     pass 'NyxNiri clears imported session variables' || fail 'NyxNiri leaks session variables'
-  if rg -Fq 'systemctl --user stop dms.service >/dev/null 2>&1 || true' "$session_wrapper"; then
-    fail 'NyxNiri ignores DMS stop failures'
+  if rg -Fq 'systemctl --user mask --runtime --now dms.service >/dev/null 2>&1 || true' "$session_wrapper"; then
+    fail 'NyxNiri ignores DMS mask failures'
   else
-    pass 'NyxNiri aborts when DMS cannot be stopped'
+    pass 'NyxNiri aborts when DMS cannot be masked'
   fi
   rg -q 'NIRI_CONFIG=.*niri-nyxniri/config.kdl' "$session_wrapper" &&
     pass 'NyxNiri uses an independent Niri config' || fail 'NyxNiri reuses the DMS config'
@@ -281,10 +281,40 @@ else
   fail 'DMS notification patch is missing or incomplete'
 fi
 
-for service in dms.service vicinae.service; do
-  systemctl --user is-active --quiet "$service" &&
-    pass "$service is active" || fail "$service is not active"
-done
+current_desktop=${XDG_SESSION_DESKTOP:-${DESKTOP_SESSION:-}}
+if [[ "${current_desktop,,}" == nyxniri ]]; then
+  if systemctl --user is-active --quiet dms.service; then
+    fail 'dms.service is active inside NyxNiri'
+  else
+    pass 'dms.service is isolated from NyxNiri'
+  fi
+
+  if noctalia msg status 2>/dev/null | jq -e '.barVisible == true' >/dev/null; then
+    pass 'Noctalia bar is active inside NyxNiri'
+  else
+    fail 'Noctalia bar is not active inside NyxNiri'
+  fi
+
+  if niri msg -j layers 2>/dev/null |
+    jq -e '[.[] | select(.namespace == "noctalia-bar-bar")] | length == 1' >/dev/null; then
+    pass 'NyxNiri has exactly one Noctalia bar layer'
+  else
+    fail 'NyxNiri does not have exactly one Noctalia bar layer'
+  fi
+
+  if niri msg -j layers 2>/dev/null |
+    jq -e '[.[] | select(.namespace | test("^(dms:|quickshell$)"))] | length == 0' >/dev/null; then
+    pass 'NyxNiri has no DMS layer surfaces'
+  else
+    fail 'NyxNiri still has DMS layer surfaces'
+  fi
+else
+  systemctl --user is-active --quiet dms.service &&
+    pass 'dms.service is active' || fail 'dms.service is not active'
+fi
+
+systemctl --user is-active --quiet vicinae.service &&
+  pass 'vicinae.service is active' || fail 'vicinae.service is not active'
 waybar_state=$(systemctl --user is-enabled waybar.service 2>/dev/null || true)
 case "$waybar_state" in
   masked|disabled|not-found|'') pass 'Waybar is inactive by configuration or absent' ;;

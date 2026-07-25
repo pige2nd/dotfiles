@@ -50,6 +50,7 @@ export -f niri dms noctalia
 export MOCK_LOG="$mock_log"
 export XDG_CONFIG_HOME="$config_home"
 export XDG_STATE_HOME="$state_home"
+unset XDG_SESSION_DESKTOP DESKTOP_SESSION NIRI_CONFIG
 
 MOCK_NIGHT_STATUS=enabled "$script" >/dev/null
 [[ $(readlink "$nyxniri_dir/effects.kdl") == effects_eyecare.kdl ]]
