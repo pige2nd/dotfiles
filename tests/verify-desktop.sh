@@ -129,6 +129,10 @@ if [[ -f "$noctalia_seed" ]]; then
     pass 'Noctalia start bar matches NyxNiri' || fail 'Noctalia start bar differs'
   rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
     pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
+  rg -Fq 'margin_edge = 6' "$noctalia_seed" &&
+    rg -Fq 'scale = 1.0' "$noctalia_seed" &&
+    rg -Fq 'thickness = 24' "$noctalia_seed" &&
+    pass 'Noctalia bar uses the compact profile' || fail 'Noctalia bar is too thick'
   rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]' "$noctalia_seed" &&
     pass 'Noctalia wallpaper and lyrics plugins are enabled' || fail 'Noctalia plugin selection differs'
   rg -Fq 'type = "fancy_audio_visualizer"' "$noctalia_seed" &&
