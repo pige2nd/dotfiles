@@ -250,6 +250,10 @@ rg -Fq 'ExecStart=/usr/bin/env vicinae server --replace' \
   "$repo_dir/systemd/.config/systemd/user/vicinae.service" &&
   pass 'Vicinae service resolves the installed binary through PATH' ||
   fail 'Vicinae service uses a stale installation path'
+rg -Fq 'XDG_DATA_DIRS=%h/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:' \
+  "$repo_dir/systemd/.config/systemd/user/vicinae.service" &&
+  pass 'Vicinae indexes user and system Flatpak applications' ||
+  fail 'Vicinae cannot discover Flatpak desktop exports'
 
 dms_runtime="$HOME/.config/DankMaterialShell/settings.json"
 [[ ! -L "$dms_runtime" ]] &&
