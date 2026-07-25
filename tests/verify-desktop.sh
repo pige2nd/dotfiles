@@ -116,6 +116,10 @@ if [[ -f "$nyxniri_config" ]]; then
     pass 'NyxNiri keeps Vicinae as launcher' || fail 'NyxNiri does not keep Vicinae'
   rg -q 'spawn "wezterm"' "$nyxniri_config" &&
     pass 'NyxNiri keeps WezTerm' || fail 'NyxNiri does not keep WezTerm'
+  rg -Fq 'place-within-backdrop true' "$nyxniri_config" &&
+    rg -Fq 'background-color "transparent"' "$nyxniri_config" &&
+    pass 'NyxNiri exposes the wallpaper through the workspace backdrop' ||
+    fail 'NyxNiri workspace background hides the wallpaper'
   if rg -n 'GBM_BACKEND|__GLX_VENDOR_LIBRARY_NAME|LIBVA_DRIVER_NAME.*nvidia' "$nyxniri_config"; then
     fail 'NyxNiri contains NVIDIA-only environment variables'
   else
