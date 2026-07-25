@@ -8,7 +8,7 @@ if ! command -v stow >/dev/null 2>&1; then
   exit 1
 fi
 
-packages=(wezterm zsh niri vicinae xresources systemd im rime applications)
+packages=(wezterm zsh niri niri-nyxniri session vicinae xresources systemd im rime applications)
 
 cd "$repo_dir"
 # Never fold a whole runtime-capable directory into the repository. DMS,
@@ -22,6 +22,28 @@ effects_link="$nyxniri_dir/effects.kdl"
 if [[ ! -e "$effects_link" && ! -L "$effects_link" ]]; then
   ln -s effects_normal.kdl "$effects_link"
 fi
+
+# The independent NyxNiri config reuses the same visual/rule files and
+# eye-care selector without changing the regular DMS-owned Niri config.
+nyxniri_session_dir="$HOME/.config/niri-nyxniri"
+mkdir -p "$nyxniri_session_dir"
+if [[ ! -e "$nyxniri_session_dir/nyxniri" && ! -L "$nyxniri_session_dir/nyxniri" ]]; then
+  ln -s ../niri/nyxniri "$nyxniri_session_dir/nyxniri"
+fi
+
+# Noctalia rewrites config.toml, so deploy a runtime copy from a portable seed.
+noctalia_source="$repo_dir/noctalia/.config/noctalia"
+noctalia_target="$HOME/.config/noctalia"
+wallpaper_dir="$HOME/Pictures/Wallpapers"
+video_wallpaper_dir="$wallpaper_dir/video"
+mkdir -p "$noctalia_target" "$video_wallpaper_dir"
+sed \
+  -e "s|@WALLPAPER_DIR@|$wallpaper_dir|g" \
+  -e "s|@VIDEO_WALLPAPER_DIR@|$video_wallpaper_dir|g" \
+  "$noctalia_source/config.toml.in" >"$noctalia_target/config.toml"
+install -m 0755 "$noctalia_source/theme-sync.sh" "$noctalia_target/theme-sync.sh"
+install -m 0755 "$noctalia_source/wallpaper-hook.sh" "$noctalia_target/wallpaper-hook.sh"
+install -m 0644 "$noctalia_source/mpv-hook.lua" "$noctalia_target/mpv-hook.lua"
 
 # DMS rewrites settings.json at runtime, so install a copy rather than a Stow
 # symlink. The repository remains the reproducible seed, not runtime state.

@@ -18,6 +18,16 @@ required_files=(
   niri/.config/niri/nyxniri/toggle-eyecare.sh
   niri/.config/niri/nyxniri/visuals.kdl
   niri/.config/niri/nyxniri/window-rules.kdl
+  niri-nyxniri/.config/niri-nyxniri/config.kdl
+  noctalia/.config/noctalia/config.toml.in
+  noctalia/.config/noctalia/theme-sync.sh
+  noctalia/.config/noctalia/wallpaper-hook.sh
+  noctalia/.config/noctalia/mpv-hook.lua
+  session/.local/bin/niri-nyxniri-session
+  session-files/niri-nyxniri.desktop
+  scripts/install-nyxniri-system.sh
+  scripts/install-nyxniri-deps.sh
+  scripts/install-nyxniri-wallpapers.sh
   dms/.config/DankMaterialShell/settings.json
   vicinae/.config/vicinae/settings.json
   xresources/.Xresources
@@ -35,7 +45,7 @@ required_files=(
 
 for path in "${required_files[@]}"; do require_file "$path"; done
 
-required_commands=(dms fcitx5 jq niri patch rg stow systemctl vicinae wechat wezterm)
+required_commands=(dms fcitx5 ffmpeg jq mpv mpvpaper niri noctalia patch playerctl rg stow systemctl vicinae wechat wezterm)
 for command_name in "${required_commands[@]}"; do
   command -v "$command_name" >/dev/null 2>&1 &&
     pass "$command_name is installed" || fail "$command_name is missing"
@@ -85,11 +95,66 @@ if [[ -f "$niri_config" ]]; then
   done
 fi
 
+nyxniri_config="$repo_dir/niri-nyxniri/.config/niri-nyxniri/config.kdl"
+if [[ -f "$nyxniri_config" ]] && command -v niri >/dev/null 2>&1; then
+  validate_dir=$(mktemp -d)
+  cp "$nyxniri_config" "$validate_dir/config.kdl"
+  ln -s "$HOME/.config/niri/nyxniri" "$validate_dir/nyxniri"
+  niri validate -c "$validate_dir/config.kdl" >/dev/null &&
+    pass 'NyxNiri session config is valid' || fail 'NyxNiri session config is invalid'
+  rm -rf "$validate_dir"
+fi
+
+if [[ -f "$nyxniri_config" ]]; then
+  rg -q 'spawn-at-startup "noctalia"' "$nyxniri_config" &&
+    pass 'NyxNiri starts Noctalia' || fail 'NyxNiri does not start Noctalia'
+  rg -q 'spawn "vicinae" "toggle"' "$nyxniri_config" &&
+    pass 'NyxNiri keeps Vicinae as launcher' || fail 'NyxNiri does not keep Vicinae'
+  rg -q 'spawn "wezterm"' "$nyxniri_config" &&
+    pass 'NyxNiri keeps WezTerm' || fail 'NyxNiri does not keep WezTerm'
+  if rg -n 'GBM_BACKEND|__GLX_VENDOR_LIBRARY_NAME|LIBVA_DRIVER_NAME.*nvidia' "$nyxniri_config"; then
+    fail 'NyxNiri contains NVIDIA-only environment variables'
+  else
+    pass 'NyxNiri is free of NVIDIA-only environment variables'
+  fi
+fi
+
+noctalia_seed="$repo_dir/noctalia/.config/noctalia/config.toml.in"
+if [[ -f "$noctalia_seed" ]]; then
+  rg -Fq 'start = ["launcher", "workspaces", "active_window"]' "$noctalia_seed" &&
+    pass 'Noctalia start bar matches NyxNiri' || fail 'Noctalia start bar differs'
+  rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
+    pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
+  rg -Fq 'enabled = ["noctalia/mpvpaper"]' "$noctalia_seed" &&
+    pass 'Noctalia mpvpaper plugin is enabled' || fail 'Noctalia mpvpaper plugin is disabled'
+  rg -q 'source = "wallpaper"' "$noctalia_seed" &&
+    pass 'Noctalia Material You follows wallpaper' || fail 'Noctalia theme does not follow wallpaper'
+  rg -q '@WALLPAPER_DIR@' "$noctalia_seed" &&
+    pass 'Noctalia wallpaper paths are portable' || fail 'Noctalia wallpaper path is not templated'
+fi
+
+session_wrapper="$repo_dir/session/.local/bin/niri-nyxniri-session"
+if [[ -f "$session_wrapper" ]]; then
+  rg -q 'systemctl --user stop dms.service' "$session_wrapper" &&
+    pass 'NyxNiri stops DMS at session entry' || fail 'NyxNiri does not isolate DMS'
+  rg -q 'systemctl --user start dms.service' "$session_wrapper" &&
+    pass 'NyxNiri restores DMS at session exit' || fail 'NyxNiri does not restore DMS'
+  rg -q 'NIRI_CONFIG=.*niri-nyxniri/config.kdl' "$session_wrapper" &&
+    pass 'NyxNiri uses an independent Niri config' || fail 'NyxNiri reuses the DMS config'
+fi
+
+wechat_rules="$repo_dir/niri/.config/niri/nyxniri/window-rules.kdl"
+rg -Fq 'app-id=r"^wechat$"' "$wechat_rules" &&
+  pass 'WeChat has a dedicated Niri rule' || fail 'WeChat Niri rule is missing'
+rg -Uq 'app-id=r"\^wechat\$"\s+opacity 1\.0\s+background-effect \{\s+blur false' "$wechat_rules" &&
+  pass 'WeChat is opaque with blur disabled' || fail 'WeChat visual compatibility rule differs'
+
 rg -q "dms keybinds set niri Mod\\+Ctrl\\+N" "$repo_dir/install.sh" &&
   pass 'NyxNiri eye-care bind is delegated to DMS' ||
   fail 'NyxNiri eye-care bind is not delegated to DMS'
 
 if rg -n 'noctalia|kitty|fish|mpvpaper' \
+  "$repo_dir/niri/.config/niri/config.kdl" \
   "$repo_dir/niri/.config/niri/nyxniri" 2>/dev/null; then
   fail 'NyxNiri integration replaces an existing desktop component'
 else
@@ -156,6 +221,14 @@ dms_runtime="$HOME/.config/DankMaterialShell/settings.json"
   pass 'Fcitx5 runtime settings are not linked to the repository' ||
   fail 'Fcitx5 runtime settings pollute the repository'
 
+[[ -f "$HOME/.config/noctalia/config.toml" && ! -L "$HOME/.config/noctalia/config.toml" ]] &&
+  pass 'Noctalia runtime settings are not linked to the repository' ||
+  fail 'Noctalia runtime settings pollute the repository'
+
+[[ -f /usr/share/wayland-sessions/niri-nyxniri.desktop ]] &&
+  pass 'NyxNiri login session is registered' ||
+  fail 'NyxNiri login session is not registered'
+
 managed_links=(
   .Xresources
   .config/niri/config.kdl
@@ -191,6 +264,10 @@ esac
 
 for script in \
   install.sh \
+  scripts/install-nyxniri-system.sh \
+  scripts/install-nyxniri-deps.sh \
+  scripts/install-nyxniri-wallpapers.sh \
+  session/.local/bin/niri-nyxniri-session \
   tests/verify-desktop.sh \
   tests/test-toggle-eyecare.sh \
   niri/.config/niri/nyxniri/toggle-eyecare.sh; do

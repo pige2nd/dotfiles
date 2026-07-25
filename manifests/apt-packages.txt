@@ -23,3 +23,13 @@ x11-xserver-utils
 xdg-desktop-portal-gnome
 xdg-desktop-portal-gtk
 xwayland-satellite
+
+# NyxNiri session (Noctalia uses its documented Ubuntu 26.04 repository;
+# mpvpaper is built into ~/.local by scripts/install-nyxniri-deps.sh)
+ffmpeg
+inotify-tools
+libmpv-dev
+libwlroots-dev
+mpv
+noctalia
+playerctl

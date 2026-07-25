@@ -7,11 +7,13 @@
 软件安装完成并克隆仓库后执行：
 
     cd ~/dotfiles
+    ./scripts/install-nyxniri-deps.sh
     sudo patch --forward -d / -p0 < patches/dms-notification-timeout.patch
     ./install.sh
+    ./scripts/install-nyxniri-system.sh
     ./tests/verify-desktop.sh
 
-第一条命令应用当前所需的 DMS 系统补丁；若提示已经应用，可跳过。install.sh 只部署配置、写入 DMS 快捷键、启用 DMS/Vicinae 服务并停用 Waybar。
+依赖脚本按 Noctalia 文档添加 Ubuntu 26.04 软件源，并把 mpvpaper 构建到 `~/.local`。系统脚本只新增 NyxNiri 登录条目，不修改原 Niri 条目。DMS 补丁若提示已经应用，可跳过。
 
 WeChat、Vicinae、WezTerm 和 Rime Mint 的安装包自行从官方渠道取得。dotfiles 只接管已验证的配置；WeChat 的登录数据不迁移。
 
@@ -34,6 +36,8 @@ FlClash 单独下载安装并导入订阅；它不属于这套自动化。
 2. Super+Space 打开 Vicinae。
 3. 中文输入在原生 Wayland 应用、WeChat 和 WezTerm 中都正常。
 4. 通知、控制中心、锁屏、电源菜单和剪贴板入口正常。
+
+注销后在登录界面选择 NyxNiri，再确认 Noctalia Bar、Dock、通知、控制中心、锁屏、静态/视频壁纸和 Material You 配色。退出 NyxNiri 后，普通 Niri 会话仍应恢复 DMS。
 
 ## 日常变更
 

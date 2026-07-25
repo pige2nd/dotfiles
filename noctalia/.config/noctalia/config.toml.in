@@ -1,0 +1,101 @@
+[audio]
+enable_overdrive = true
+
+[backdrop]
+blur_intensity = 0.69
+tint_intensity = 0.0
+
+[bar]
+order = ["bar"]
+
+[bar.bar]
+background_opacity = 0.0
+border_width = 0.0
+capsule = true
+capsule_border = "outline"
+capsule_foreground = "secondary"
+capsule_opacity = 0.79
+capsule_padding = 10.0
+capsule_radius = 80
+capsule_thickness = 0.96
+enabled = true
+panel_overlap = 12
+font_family = "JetBrains Mono"
+margin_ends = 14
+margin_edge = 10
+scale = 1.1
+shadow = false
+start = ["launcher", "workspaces", "active_window"]
+center = ["clock"]
+end = ["media", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
+thickness = 36
+
+[brightness]
+enable_ddcutil = false
+
+[dock]
+auto_hide = false
+enabled = true
+margin_edge = 10
+radius = 20
+reserve_space = false
+show_dots = true
+smart_auto_hide = true
+
+[hooks]
+theme_mode_changed = ["~/.config/noctalia/theme-sync.sh"]
+wallpaper_changed = ["~/.config/noctalia/wallpaper-hook.sh"]
+
+[osd]
+background_opacity = 0.85
+offset_y = 20
+position = "bottom_center"
+scale = 0.9
+
+[shell]
+font_family = "Noto Sans CJK SC"
+settings_show_advanced = true
+ui_scale = 1.2
+telemetry_enabled = false
+
+[shell.panel]
+control_center_placement = "floating"
+control_center_position = "top_right"
+transparency_mode = "soft"
+wallpaper_placement = "floating"
+wallpaper_position = "center"
+
+[theme]
+builtin = "Ayu"
+mode = "dark"
+source = "wallpaper"
+wallpaper_scheme = "m3-content"
+
+[theme.templates]
+builtin_ids = ["qt"]
+community_ids = []
+
+[wallpaper]
+directory = "@WALLPAPER_DIR@"
+fill_mode = "crop"
+
+[plugins]
+enabled = ["noctalia/mpvpaper"]
+
+[widget.active_window]
+min_length = 0
+
+[widget.clock]
+format = "{:%a, %d %b %H:%M}"
+
+[widget.tray]
+detached_panel = true
+drawer = true
+
+[widget.mpvpaper]
+type = "noctalia/mpvpaper:mpvpaper"
+
+[plugin_settings."noctalia/mpvpaper"]
+mpv_options = "--script=~/.config/noctalia/mpv-hook.lua"
+picker_placement = "floating"
+video_directory = "@VIDEO_WALLPAPER_DIR@"

@@ -18,6 +18,16 @@ window-rule {
     opacity 1.0
 }
 
+// Official WeChat runs through XWayland. Avoid blur artifacts in menus and
+// input-method popups while keeping the main window tiled.
+window-rule {
+    match app-id=r"^wechat$"
+    opacity 1.0
+    background-effect {
+        blur false
+    }
+}
+
 // Normalize common browser picture-in-picture windows without changing browsers.
 window-rule {
     match title=r"^(Picture-in-Picture|画中画)$"

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+restore_dms() {
+  systemctl --user start dms.service >/dev/null 2>&1 || true
+}
+trap restore_dms EXIT HUP INT TERM
+
+systemctl --user stop dms.service >/dev/null 2>&1 || true
+
+export NIRI_CONFIG="$HOME/.config/niri-nyxniri/config.kdl"
+export XDG_CURRENT_DESKTOP=niri
+export XDG_SESSION_DESKTOP=NyxNiri
+export DESKTOP_SESSION=NyxNiri
+
+niri-session
