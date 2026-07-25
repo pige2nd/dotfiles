@@ -25,13 +25,13 @@ enabled = true
 panel_overlap = 12
 font_family = "JetBrains Mono"
 margin_ends = 14
-margin_edge = 6
-scale = 1.0
+margin_edge = 10
+scale = 1.1
 shadow = false
 start = ["launcher", "workspaces", "active_window"]
 center = ["clock"]
 end = ["media", "lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
-thickness = 24
+thickness = 36
 
 [brightness]
 enable_ddcutil = false
