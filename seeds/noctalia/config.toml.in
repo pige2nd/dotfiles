@@ -28,7 +28,7 @@ margin_ends = 14
 margin_edge = 10
 scale = 1.1
 shadow = false
-start = ["launcher", "workspaces", "active_window"]
+start = ["vicinae-launcher", "workspaces", "active_window"]
 center = ["clock"]
 end = ["lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
 thickness = 36
@@ -112,6 +112,12 @@ min_length = 0
 
 [widget.clock]
 format = "{:%a, %d %b %H:%M}"
+
+[widget.vicinae-launcher]
+type = "custom_button"
+glyph = "search"
+tooltip = "Vicinae"
+command = "vicinae toggle"
 
 [widget.media]
 hide_artist = true

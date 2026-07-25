@@ -129,8 +129,11 @@ fi
 
 noctalia_seed="$repo_dir/seeds/noctalia/config.toml.in"
 if [[ -f "$noctalia_seed" ]]; then
-  rg -Fq 'start = ["launcher", "workspaces", "active_window"]' "$noctalia_seed" &&
-    pass 'Noctalia start bar matches NyxNiri' || fail 'Noctalia start bar differs'
+  rg -Fq 'start = ["vicinae-launcher", "workspaces", "active_window"]' "$noctalia_seed" &&
+    rg -Fq '[widget.vicinae-launcher]' "$noctalia_seed" &&
+    rg -Fq 'command = "vicinae toggle"' "$noctalia_seed" &&
+    pass 'Noctalia search capsule launches Vicinae' ||
+    fail 'Noctalia search capsule does not launch Vicinae'
   rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
     pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
   rg -Fq 'end = ["lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]' "$noctalia_seed" &&
