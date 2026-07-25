@@ -129,11 +129,17 @@ fi
 
 noctalia_seed="$repo_dir/seeds/noctalia/config.toml.in"
 if [[ -f "$noctalia_seed" ]]; then
-  rg -Fq 'start = ["vicinae-launcher", "workspaces", "active_window"]' "$noctalia_seed" &&
+  rg -Fq 'start = ["vicinae-launcher", "workspaces", "active_window", "ram"]' "$noctalia_seed" &&
     rg -Fq '[widget.vicinae-launcher]' "$noctalia_seed" &&
     rg -Fq 'command = "vicinae toggle"' "$noctalia_seed" &&
     pass 'Noctalia search capsule launches Vicinae' ||
     fail 'Noctalia search capsule does not launch Vicinae'
+  rg -Fq '[widget.ram]' "$noctalia_seed" &&
+    rg -Fq 'stat = "ram_pct"' "$noctalia_seed" &&
+    rg -Fq 'display = "text"' "$noctalia_seed" &&
+    rg -Fq 'label_min_width = 0' "$noctalia_seed" &&
+    pass 'Noctalia left bar has a compact RAM utilization capsule' ||
+    fail 'Noctalia RAM utilization capsule is missing or too wide'
   rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
     pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
   rg -Fq 'end = ["lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]' "$noctalia_seed" &&
