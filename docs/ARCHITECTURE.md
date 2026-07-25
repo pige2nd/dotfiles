@@ -44,7 +44,7 @@
 - Noctalia 按合成器官方建议由 Niri 自启动；不启用全局 Noctalia 用户服务。
 - Bar 采用 NyxNiri V2 的三段胶囊布局，Dock 启用；Vicinae 仍是 Super+Space 主启动器，终端仍是 WezTerm。
 - 静态和视频壁纸位于 `~/Pictures/Wallpapers`。`mpvpaper` 插件播放视频，ffmpeg 抽帧交给 Noctalia 做 Material You 配色。
-- 登录管理器条目只新增 `/usr/share/wayland-sessions/niri-nyxniri.desktop`，原 `niri.desktop` 不修改。
+- 登录管理器条目新增 `/usr/share/wayland-sessions/niri-nyxniri.desktop`，通用启动器安装在 GDM 可访问的 `/usr/local/bin/niri-nyxniri-session`；原 `niri.desktop` 不修改。
 
 ## 明确排除
 

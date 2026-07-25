@@ -29,6 +29,7 @@ required_files=(
   scripts/install-nyxniri-deps.sh
   scripts/install-nyxniri-wallpapers.sh
   tests/test-nyxniri-session.sh
+  tests/test-session-discoverable.sh
   dms/.config/DankMaterialShell/settings.json
   vicinae/.config/vicinae/settings.json
   xresources/.Xresources
@@ -225,6 +226,11 @@ else
   fail 'DMS-generated Niri keybinds are missing'
 fi
 
+rg -Fq 'ExecStart=/usr/bin/env vicinae server --replace' \
+  "$repo_dir/systemd/.config/systemd/user/vicinae.service" &&
+  pass 'Vicinae service resolves the installed binary through PATH' ||
+  fail 'Vicinae service uses a stale installation path'
+
 dms_runtime="$HOME/.config/DankMaterialShell/settings.json"
 [[ ! -L "$dms_runtime" ]] &&
   pass 'DMS runtime settings are not linked to the repository' ||
@@ -247,6 +253,10 @@ done
 [[ -f /usr/share/wayland-sessions/niri-nyxniri.desktop ]] &&
   pass 'NyxNiri login session is registered' ||
   fail 'NyxNiri login session is not registered'
+
+[[ -x /usr/local/bin/niri-nyxniri-session ]] &&
+  pass 'NyxNiri launcher is visible to the display manager' ||
+  fail 'NyxNiri launcher is not visible to the display manager'
 
 managed_links=(
   .Xresources
@@ -290,6 +300,7 @@ for script in \
   tests/verify-desktop.sh \
   tests/test-toggle-eyecare.sh \
   tests/test-nyxniri-session.sh \
+  tests/test-session-discoverable.sh \
   niri/.config/niri/nyxniri/toggle-eyecare.sh; do
   if [[ -f "$repo_dir/$script" ]]; then
     bash -n "$repo_dir/$script" && pass "$script syntax" || fail "$script syntax"
@@ -306,6 +317,12 @@ if "$repo_dir/tests/test-nyxniri-session.sh" >/dev/null; then
   pass 'NyxNiri session isolation and cleanup'
 else
   fail 'NyxNiri session isolation and cleanup'
+fi
+
+if "$repo_dir/tests/test-session-discoverable.sh" >/dev/null; then
+  pass 'NyxNiri display-manager discovery'
+else
+  fail 'NyxNiri display-manager discovery'
 fi
 
 zsh -i -c exit >/dev/null 2>&1 &&
