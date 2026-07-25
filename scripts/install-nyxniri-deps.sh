@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 keyring=/tmp/nickh-archive-keyring.deb
 source_url=https://pkg.noctalia.dev/deb/noctalia-resolute.sources
 
@@ -19,4 +20,6 @@ meson setup "$build_dir/mpvpaper/build" "$build_dir/mpvpaper" --prefix="$HOME/.l
 ninja -C "$build_dir/mpvpaper/build"
 ninja -C "$build_dir/mpvpaper/build" install
 
-printf '%s\n' 'Noctalia V5 与 mpvpaper 已安装。'
+"$repo_dir/scripts/prefetch-noctalia-plugins.sh"
+
+printf '%s\n' 'Noctalia V5、mpvpaper 与插件源已安装。'

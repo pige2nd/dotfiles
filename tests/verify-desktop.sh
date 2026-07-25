@@ -27,7 +27,9 @@ required_files=(
   session-files/niri-nyxniri.desktop
   scripts/install-nyxniri-system.sh
   scripts/install-nyxniri-deps.sh
+  scripts/prefetch-noctalia-plugins.sh
   scripts/install-nyxniri-wallpapers.sh
+  tests/test-noctalia-plugins.sh
   tests/test-nyxniri-session.sh
   tests/test-session-discoverable.sh
   dms/.config/DankMaterialShell/settings.json
@@ -127,8 +129,14 @@ if [[ -f "$noctalia_seed" ]]; then
     pass 'Noctalia start bar matches NyxNiri' || fail 'Noctalia start bar differs'
   rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
     pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
-  rg -Fq 'enabled = ["noctalia/mpvpaper"]' "$noctalia_seed" &&
-    pass 'Noctalia mpvpaper plugin is enabled' || fail 'Noctalia mpvpaper plugin is disabled'
+  rg -Fq 'enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]' "$noctalia_seed" &&
+    pass 'Noctalia wallpaper and lyrics plugins are enabled' || fail 'Noctalia plugin selection differs'
+  rg -Fq 'type = "fancy_audio_visualizer"' "$noctalia_seed" &&
+    pass 'Noctalia desktop audio visualizer is enabled' || fail 'Noctalia desktop audio visualizer is disabled'
+  rg -Fq 'ui_scale = 1.2' "$noctalia_seed" &&
+    pass 'Noctalia non-bar UI uses the NyxNiri scale' || fail 'Noctalia UI scale differs'
+  rg -Fq 'telemetry_enabled = false' "$noctalia_seed" &&
+    pass 'Noctalia telemetry is explicitly disabled' || fail 'Noctalia telemetry is not explicitly disabled'
   rg -q 'source = "wallpaper"' "$noctalia_seed" &&
     pass 'Noctalia Material You follows wallpaper' || fail 'Noctalia theme does not follow wallpaper'
   rg -q '@WALLPAPER_DIR@' "$noctalia_seed" &&
@@ -295,6 +303,12 @@ if [[ "${current_desktop,,}" == nyxniri ]]; then
     fail 'Noctalia bar is not active inside NyxNiri'
   fi
 
+  if "$repo_dir/tests/test-noctalia-plugins.sh" --runtime >/dev/null 2>&1; then
+    pass 'Noctalia wallpaper and lyrics plugins are loaded'
+  else
+    fail 'Noctalia wallpaper or lyrics plugin is not loaded'
+  fi
+
   if niri msg -j layers 2>/dev/null |
     jq -e '[.[] | select(.namespace == "noctalia-bar-bar")] | length == 1' >/dev/null; then
     pass 'NyxNiri has exactly one Noctalia bar layer'
@@ -325,9 +339,11 @@ for script in \
   install.sh \
   scripts/install-nyxniri-system.sh \
   scripts/install-nyxniri-deps.sh \
+  scripts/prefetch-noctalia-plugins.sh \
   scripts/install-nyxniri-wallpapers.sh \
   session/.local/bin/niri-nyxniri-session \
   tests/verify-desktop.sh \
+  tests/test-noctalia-plugins.sh \
   tests/test-toggle-eyecare.sh \
   tests/test-nyxniri-session.sh \
   tests/test-session-discoverable.sh \
@@ -336,6 +352,12 @@ for script in \
     bash -n "$repo_dir/$script" && pass "$script syntax" || fail "$script syntax"
   fi
 done
+
+if "$repo_dir/tests/test-noctalia-plugins.sh" >/dev/null 2>&1; then
+  pass 'Noctalia plugin prefetch and compatibility fallback'
+else
+  fail 'Noctalia plugin prefetch and compatibility fallback'
+fi
 
 if "$repo_dir/tests/test-toggle-eyecare.sh" >/dev/null; then
   pass 'NyxNiri eye-care state transitions for DMS and Noctalia'

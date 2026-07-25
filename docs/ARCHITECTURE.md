@@ -42,8 +42,9 @@
 
 - `~/.config/niri-nyxniri/config.kdl` 是独立入口，不包含任何 DMS 生成文件，也不含 NVIDIA 专用变量。和当前普通 Niri 配置一样不声明 `output`，继续使用 Niri 自动检测。
 - Noctalia 按合成器官方建议由 Niri 自启动；不启用全局 Noctalia 用户服务。
-- Bar 采用 NyxNiri V2 的三段胶囊布局，Dock 启用；Vicinae 仍是 Super+Space 主启动器，终端仍是 WezTerm。
-- 静态和视频壁纸位于 `~/Pictures/Wallpapers`。`mpvpaper` 插件播放视频，ffmpeg 抽帧交给 Noctalia 做 Material You 配色。
+- Bar 采用 NyxNiri V2 的三段胶囊布局，Dock 启用；媒体之后显示社区同步歌词组件。Vicinae 仍是 Super+Space 主启动器，终端仍是 WezTerm。
+- 静态和视频壁纸位于 `~/Pictures/Wallpapers`。`mpvpaper` 插件播放视频，ffmpeg 抽帧交给 Noctalia 做 Material You 配色；桌面中央使用 Noctalia 内置的音频环形可视化，无音频时自动淡出。
+- Noctalia 非 Bar 界面按 1.2 倍缩放；匿名启动遥测保持关闭。官方和社区插件源在依赖安装阶段顺序预取，避开首次启动并发克隆的短超时。
 - 登录管理器条目新增 `/usr/share/wayland-sessions/niri-nyxniri.desktop`，通用启动器安装在 GDM 可访问的 `/usr/local/bin/niri-nyxniri-session`；原 `niri.desktop` 不修改。
 
 ## 明确排除

@@ -1,6 +1,9 @@
 [audio]
 enable_overdrive = true
 
+[accessibility]
+ui_scale = 1.2
+
 [backdrop]
 blur_intensity = 0.69
 tint_intensity = 0.0
@@ -27,11 +30,34 @@ scale = 1.1
 shadow = false
 start = ["launcher", "workspaces", "active_window"]
 center = ["clock"]
-end = ["media", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
+end = ["media", "lyrics", "tray", "wallpaper", "mpvpaper", "volume", "notifications", "session"]
 thickness = 36
 
 [brightness]
 enable_ddcutil = false
+
+[desktop_widgets]
+enabled = true
+schema_version = 2
+widget_order = ["audio-visualizer"]
+
+[desktop_widgets.grid]
+cell_size = 16
+major_interval = 4
+visible = true
+
+[desktop_widgets.widget.audio-visualizer]
+box_height = 0.0
+box_width = 0.0
+cx = 780.0
+cy = 520.0
+rotation = 0.0
+type = "fancy_audio_visualizer"
+
+[desktop_widgets.widget.audio-visualizer.settings]
+background = false
+fade_when_idle = true
+visualization_mode = "wave_rings"
 
 [dock]
 auto_hide = false
@@ -79,7 +105,7 @@ directory = "@WALLPAPER_DIR@"
 fill_mode = "crop"
 
 [plugins]
-enabled = ["noctalia/mpvpaper"]
+enabled = ["noctalia/mpvpaper", "h465855hgg/lyrics"]
 
 [widget.active_window]
 min_length = 0
@@ -94,7 +120,18 @@ drawer = true
 [widget.mpvpaper]
 type = "noctalia/mpvpaper:mpvpaper"
 
+[widget.lyrics]
+type = "h465855hgg/lyrics:lyrics"
+
 [plugin_settings."noctalia/mpvpaper"]
 mpv_options = "--script=~/.config/noctalia/mpv-hook.lua"
 picker_placement = "floating"
 video_directory = "@VIDEO_WALLPAPER_DIR@"
+
+[plugin_settings."h465855hgg/lyrics"]
+display_mode = "toggle"
+double_line = true
+karaoke_enabled = true
+lyrics_source = "auto"
+show_translation = true
+translation_language = "zh-Hans"

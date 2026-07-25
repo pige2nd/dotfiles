@@ -13,7 +13,7 @@
     ./scripts/install-nyxniri-system.sh
     ./tests/verify-desktop.sh
 
-依赖脚本按 Noctalia 文档添加 Ubuntu 26.04 软件源，并把 mpvpaper 构建到 `~/.local`。系统脚本只新增 NyxNiri 登录条目，不修改原 Niri 条目。DMS 补丁若提示已经应用，可跳过。
+依赖脚本按 Noctalia 文档添加 Ubuntu 26.04 软件源，把 mpvpaper 构建到 `~/.local`，并顺序预取 official/community 插件源。若 Noctalia 已经安装而插件列表为空，可单独运行 `./scripts/prefetch-noctalia-plugins.sh`。系统脚本只新增 NyxNiri 登录条目，不修改原 Niri 条目。DMS 补丁若提示已经应用，可跳过。
 
 WeChat、Vicinae、WezTerm 和 Rime Mint 的安装包自行从官方渠道取得。dotfiles 只接管已验证的配置；WeChat 的登录数据不迁移。
 
