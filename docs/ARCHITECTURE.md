@@ -7,7 +7,7 @@
 - Niri 负责合成、平铺、列布局和工作区；接受它的原生模型，不实现“假最小化”。
 - 普通 `Niri` 登录会话仍以 DMS 作为唯一桌面外壳：原生栏、控制中心、通知、设置、锁屏、壁纸和剪贴板。
 - 独立 `NyxNiri` 登录会话以 Noctalia V5 替换 Bar、Dock、通知、控制中心、锁屏和壁纸系统；进入时停止 DMS，退出时恢复 DMS。
-- 两个会话复用动画、阴影、透明模糊、护眼模式和窗口规则，但使用不同的 Niri 主配置。
+- 两个会话复用动画、阴影、透明模糊、护眼模式和窗口规则，但使用不同的 Niri 主配置；护眼脚本按当前会话调用 DMS 或 Noctalia 的夜间模式。
 - 每个会话只有一条 Shell 栏：普通 Niri 使用 DMS，NyxNiri 使用 Noctalia；Waybar 不运行。
 - Vicinae 是唯一键盘主启动器，Super+Space 打开；DMS 栏上的按钮保留为鼠标备用抽屉，不绑定快捷键。
 - WeChat 与 WezTerm 暂时使用 XWayland，以优先保证输入法和缩放稳定。
@@ -30,7 +30,7 @@
 
 - 手写源文件位于 dotfiles，静态配置由 GNU Stow 链接到用户目录。
 - DMS 和 Fcitx5 会重写配置，因此仓库文件只作种子，由 install.sh 复制到运行目录，避免运行状态反写仓库。
-- Noctalia 同样会重写 `config.toml`；仓库保存带路径占位符的种子，install.sh 展开为用户目录中的运行副本。
+- Noctalia 同样会重写 `config.toml`；仓库保存带路径占位符的种子，install.sh 展开为用户目录中的运行副本；静态 Hook 仍由 Stow 管理。
 - DMS 生成的 niri/dms/*.kdl 仍由 DMS 管理，不手工修改。
 - 手写的 `niri/nyxniri/*.kdl` 与 DMS 生成文件分离；`effects.kdl` 是运行时软链接，不进入仓库。
 - Niri 快捷键覆盖通过 dms keybinds 写入，避免下次生成时丢失。
@@ -40,7 +40,7 @@
 
 ## NyxNiri 会话
 
-- `~/.config/niri-nyxniri/config.kdl` 是独立入口，不包含任何 DMS 生成文件，也不含 NVIDIA 专用变量。
+- `~/.config/niri-nyxniri/config.kdl` 是独立入口，不包含任何 DMS 生成文件，也不含 NVIDIA 专用变量。和当前普通 Niri 配置一样不声明 `output`，继续使用 Niri 自动检测。
 - Noctalia 按合成器官方建议由 Niri 自启动；不启用全局 Noctalia 用户服务。
 - Bar 采用 NyxNiri V2 的三段胶囊布局，Dock 启用；Vicinae 仍是 Super+Space 主启动器，终端仍是 WezTerm。
 - 静态和视频壁纸位于 `~/Pictures/Wallpapers`。`mpvpaper` 插件播放视频，ffmpeg 抽帧交给 Noctalia 做 Material You 配色。

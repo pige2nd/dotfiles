@@ -19,7 +19,7 @@ required_files=(
   niri/.config/niri/nyxniri/visuals.kdl
   niri/.config/niri/nyxniri/window-rules.kdl
   niri-nyxniri/.config/niri-nyxniri/config.kdl
-  noctalia/.config/noctalia/config.toml.in
+  seeds/noctalia/config.toml.in
   noctalia/.config/noctalia/theme-sync.sh
   noctalia/.config/noctalia/wallpaper-hook.sh
   noctalia/.config/noctalia/mpv-hook.lua
@@ -28,6 +28,7 @@ required_files=(
   scripts/install-nyxniri-system.sh
   scripts/install-nyxniri-deps.sh
   scripts/install-nyxniri-wallpapers.sh
+  tests/test-nyxniri-session.sh
   dms/.config/DankMaterialShell/settings.json
   vicinae/.config/vicinae/settings.json
   xresources/.Xresources
@@ -119,7 +120,7 @@ if [[ -f "$nyxniri_config" ]]; then
   fi
 fi
 
-noctalia_seed="$repo_dir/noctalia/.config/noctalia/config.toml.in"
+noctalia_seed="$repo_dir/seeds/noctalia/config.toml.in"
 if [[ -f "$noctalia_seed" ]]; then
   rg -Fq 'start = ["launcher", "workspaces", "active_window"]' "$noctalia_seed" &&
     pass 'Noctalia start bar matches NyxNiri' || fail 'Noctalia start bar differs'
@@ -139,6 +140,13 @@ if [[ -f "$session_wrapper" ]]; then
     pass 'NyxNiri stops DMS at session entry' || fail 'NyxNiri does not isolate DMS'
   rg -q 'systemctl --user start dms.service' "$session_wrapper" &&
     pass 'NyxNiri restores DMS at session exit' || fail 'NyxNiri does not restore DMS'
+  rg -q 'systemctl --user unset-environment' "$session_wrapper" &&
+    pass 'NyxNiri clears imported session variables' || fail 'NyxNiri leaks session variables'
+  if rg -Fq 'systemctl --user stop dms.service >/dev/null 2>&1 || true' "$session_wrapper"; then
+    fail 'NyxNiri ignores DMS stop failures'
+  else
+    pass 'NyxNiri aborts when DMS cannot be stopped'
+  fi
   rg -q 'NIRI_CONFIG=.*niri-nyxniri/config.kdl' "$session_wrapper" &&
     pass 'NyxNiri uses an independent Niri config' || fail 'NyxNiri reuses the DMS config'
 fi
@@ -146,8 +154,10 @@ fi
 wechat_rules="$repo_dir/niri/.config/niri/nyxniri/window-rules.kdl"
 rg -Fq 'app-id=r"^wechat$"' "$wechat_rules" &&
   pass 'WeChat has a dedicated Niri rule' || fail 'WeChat Niri rule is missing'
-rg -Uq 'app-id=r"\^wechat\$"\s+opacity 1\.0\s+background-effect \{\s+blur false' "$wechat_rules" &&
+rg -Uq 'app-id=r"\^wechat\$"\s+open-floating false\s+opacity 1\.0\s+background-effect \{\s+blur false' "$wechat_rules" &&
   pass 'WeChat is opaque with blur disabled' || fail 'WeChat visual compatibility rule differs'
+rg -Uq 'app-id=r"\^wechat\$"\s+open-floating false' "$wechat_rules" &&
+  pass 'WeChat explicitly opens tiled' || fail 'WeChat tiled rule is missing'
 
 rg -q "dms keybinds set niri Mod\\+Ctrl\\+N" "$repo_dir/install.sh" &&
   pass 'NyxNiri eye-care bind is delegated to DMS' ||
@@ -155,7 +165,10 @@ rg -q "dms keybinds set niri Mod\\+Ctrl\\+N" "$repo_dir/install.sh" &&
 
 if rg -n 'noctalia|kitty|fish|mpvpaper' \
   "$repo_dir/niri/.config/niri/config.kdl" \
-  "$repo_dir/niri/.config/niri/nyxniri" 2>/dev/null; then
+  "$repo_dir/niri/.config/niri/nyxniri/visuals.kdl" \
+  "$repo_dir/niri/.config/niri/nyxniri/effects_normal.kdl" \
+  "$repo_dir/niri/.config/niri/nyxniri/effects_eyecare.kdl" \
+  "$repo_dir/niri/.config/niri/nyxniri/window-rules.kdl" 2>/dev/null; then
   fail 'NyxNiri integration replaces an existing desktop component'
 else
   pass 'NyxNiri integration keeps DMS, Vicinae, WezTerm and Zsh'
@@ -225,6 +238,12 @@ dms_runtime="$HOME/.config/DankMaterialShell/settings.json"
   pass 'Noctalia runtime settings are not linked to the repository' ||
   fail 'Noctalia runtime settings pollute the repository'
 
+for hook_name in theme-sync.sh wallpaper-hook.sh mpv-hook.lua; do
+  [[ -L "$HOME/.config/noctalia/$hook_name" ]] &&
+    pass "Noctalia hook $hook_name is managed by Stow" ||
+    fail "Noctalia hook $hook_name is not managed by Stow"
+done
+
 [[ -f /usr/share/wayland-sessions/niri-nyxniri.desktop ]] &&
   pass 'NyxNiri login session is registered' ||
   fail 'NyxNiri login session is not registered'
@@ -270,6 +289,7 @@ for script in \
   session/.local/bin/niri-nyxniri-session \
   tests/verify-desktop.sh \
   tests/test-toggle-eyecare.sh \
+  tests/test-nyxniri-session.sh \
   niri/.config/niri/nyxniri/toggle-eyecare.sh; do
   if [[ -f "$repo_dir/$script" ]]; then
     bash -n "$repo_dir/$script" && pass "$script syntax" || fail "$script syntax"
@@ -277,9 +297,15 @@ for script in \
 done
 
 if "$repo_dir/tests/test-toggle-eyecare.sh" >/dev/null; then
-  pass 'NyxNiri eye-care state transitions'
+  pass 'NyxNiri eye-care state transitions for DMS and Noctalia'
 else
   fail 'NyxNiri eye-care state transitions'
+fi
+
+if "$repo_dir/tests/test-nyxniri-session.sh" >/dev/null; then
+  pass 'NyxNiri session isolation and cleanup'
+else
+  fail 'NyxNiri session isolation and cleanup'
 fi
 
 zsh -i -c exit >/dev/null 2>&1 &&

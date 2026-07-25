@@ -7,6 +7,13 @@ nyxniri_dir="$config_home/niri/nyxniri"
 state_dir="$state_home/niri"
 state_file="$state_dir/nyxniri-eyecare"
 effects_link="$nyxniri_dir/effects.kdl"
+config_file=${NIRI_CONFIG:-"$config_home/niri/config.kdl"}
+session_desktop=${XDG_SESSION_DESKTOP:-${DESKTOP_SESSION:-}}
+if [[ "${session_desktop,,}" == nyxniri ]]; then
+  shell_backend=noctalia
+else
+  shell_backend=dms
+fi
 
 mkdir -p "$state_dir"
 
@@ -21,7 +28,9 @@ else
   next_mode=eye-care
   previous_night_state=unknown
 
-  if command -v dms >/dev/null 2>&1; then
+  if [[ "$shell_backend" == noctalia ]]; then
+    previous_night_state=noctalia
+  elif command -v dms >/dev/null 2>&1; then
     night_status=$(dms ipc call night status 2>/dev/null || true)
     case "$night_status" in
       *"Night mode: enabled"*) previous_night_state=enabled ;;
@@ -32,7 +41,7 @@ fi
 
 ln -sfn "$next_effect" "$effects_link"
 
-if ! niri validate -c "$config_home/niri/config.kdl" >/dev/null; then
+if ! niri validate -c "$config_file" >/dev/null; then
   ln -sfn "$previous_effect" "$effects_link"
   printf 'NyxNiri: refusing to activate an invalid %s configuration.\n' "$next_mode" >&2
   exit 1
@@ -45,22 +54,41 @@ if ! niri msg action load-config-file >/dev/null 2>&1; then
   exit 1
 fi
 
-dms_warning=
+shell_warning=
 if [[ "$next_mode" == eye-care ]]; then
   printf '%s\n' "$previous_night_state" >"$state_file"
 
-  if ! command -v dms >/dev/null 2>&1 ||
+  if [[ "$shell_backend" == noctalia ]]; then
+    if ! noctalia msg nightlight-force-toggle >/dev/null 2>&1; then
+      ln -sfn "$previous_effect" "$effects_link"
+      niri msg action load-config-file >/dev/null 2>&1 || true
+      rm -f "$state_file"
+      printf '%s\n' 'NyxNiri: Noctalia night light was unavailable; eye-care mode was rolled back.' >&2
+      exit 1
+    fi
+  elif ! command -v dms >/dev/null 2>&1 ||
     ! dms ipc call night enable >/dev/null 2>&1; then
-    dms_warning='DMS night mode was unavailable; only the visual effect changed.'
+    shell_warning='DMS night mode was unavailable; only the visual effect changed.'
   fi
 else
+  if [[ "$previous_night_state" == noctalia ]]; then
+    if ! noctalia msg nightlight-force-toggle >/dev/null 2>&1; then
+      ln -sfn "$previous_effect" "$effects_link"
+      niri msg action load-config-file >/dev/null 2>&1 || true
+      printf '%s\n' \
+        'NyxNiri: Noctalia night light could not be restored; eye-care mode remains active.' >&2
+      exit 1
+    fi
+    night_action=
+  else
   case "$previous_night_state" in
     enabled) night_action=enable ;;
     disabled) night_action=disable ;;
     *) night_action= ;;
   esac
+  fi
 
-  if [[ -n "$night_action" ]] &&
+  if [[ "$previous_night_state" != noctalia && -n "$night_action" ]] &&
     { ! command -v dms >/dev/null 2>&1 ||
       ! dms ipc call night "$night_action" >/dev/null 2>&1; }; then
     ln -sfn "$previous_effect" "$effects_link"
@@ -73,7 +101,7 @@ else
   rm -f "$state_file"
 fi
 
-if [[ -n "$dms_warning" ]]; then
-  printf 'NyxNiri: %s\n' "$dms_warning" >&2
+if [[ -n "$shell_warning" ]]; then
+  printf 'NyxNiri: %s\n' "$shell_warning" >&2
 fi
 printf 'NyxNiri: %s mode enabled.\n' "$next_mode"

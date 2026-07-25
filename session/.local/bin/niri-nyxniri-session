@@ -2,11 +2,38 @@
 set -uo pipefail
 
 restore_dms() {
+  state_home=${XDG_STATE_HOME:-"$HOME/.local/state"}
+  state_file="$state_home/niri/nyxniri-eyecare"
+  effects_link="$HOME/.config/niri/nyxniri/effects.kdl"
+  if [[ -f "$state_file" && "$(<"$state_file")" == noctalia ]]; then
+    noctalia msg nightlight-force-toggle >/dev/null 2>&1 || true
+  fi
+  rm -f "$state_file"
+  ln -sfn effects_normal.kdl "$effects_link"
+  systemctl --user unset-environment \
+    NIRI_CONFIG XDG_SESSION_DESKTOP DESKTOP_SESSION >/dev/null 2>&1 || true
   systemctl --user start dms.service >/dev/null 2>&1 || true
 }
 trap restore_dms EXIT HUP INT TERM
 
-systemctl --user stop dms.service >/dev/null 2>&1 || true
+state_home=${XDG_STATE_HOME:-"$HOME/.local/state"}
+state_file="$state_home/niri/nyxniri-eyecare"
+effects_link="$HOME/.config/niri/nyxniri/effects.kdl"
+if [[ -f "$state_file" ]]; then
+  previous_night_state=$(<"$state_file")
+  case "$previous_night_state" in
+    enabled|disabled)
+      dms ipc call night "$previous_night_state" >/dev/null 2>&1 || true
+      ;;
+  esac
+  rm -f "$state_file"
+fi
+ln -sfn effects_normal.kdl "$effects_link"
+
+if ! systemctl --user stop dms.service; then
+  printf '%s\n' 'NyxNiri: 无法停止 DMS，已取消启动以避免两个桌面 Shell 冲突。' >&2
+  exit 1
+fi
 
 export NIRI_CONFIG="$HOME/.config/niri-nyxniri/config.kdl"
 export XDG_CURRENT_DESKTOP=niri

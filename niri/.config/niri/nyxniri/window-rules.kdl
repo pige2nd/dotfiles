@@ -22,6 +22,7 @@ window-rule {
 // input-method popups while keeping the main window tiled.
 window-rule {
     match app-id=r"^wechat$"
+    open-floating false
     opacity 1.0
     background-effect {
         blur false

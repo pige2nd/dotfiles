@@ -1,5 +1,7 @@
 // Independent Niri session using Noctalia V5.
 // The regular ~/.config/niri/config.kdl remains owned by DMS.
+// No output block is intentional: the regular session also uses Niri's
+// automatic output detection, so connector modes/scales remain unchanged.
 
 input {
     keyboard {

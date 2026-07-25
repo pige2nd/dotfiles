@@ -37,7 +37,12 @@ dms() {
   [[ "${MOCK_DMS_FAIL:-0}" != 1 ]]
 }
 
-export -f niri dms
+noctalia() {
+  printf 'noctalia %s\n' "$*" >>"$MOCK_LOG"
+  [[ "${MOCK_NOCTALIA_FAIL:-0}" != 1 ]]
+}
+
+export -f niri dms noctalia
 export MOCK_LOG="$mock_log"
 export XDG_CONFIG_HOME="$config_home"
 export XDG_STATE_HOME="$state_home"
@@ -61,6 +66,24 @@ MOCK_DMS_FAIL=1 "$script" >/dev/null 2>&1 && exit 1
 [[ ! -e "$state_home/niri/nyxniri-eyecare" ]]
 
 MOCK_NIRI_FAIL_LOAD=1 MOCK_NIGHT_STATUS=disabled \
+  "$script" >/dev/null 2>&1 && exit 1
+[[ $(readlink "$nyxniri_dir/effects.kdl") == effects_normal.kdl ]]
+[[ ! -e "$state_home/niri/nyxniri-eyecare" ]]
+
+XDG_SESSION_DESKTOP=NyxNiri NIRI_CONFIG="$config_home/niri/config.kdl" \
+  "$script" >/dev/null
+[[ $(readlink "$nyxniri_dir/effects.kdl") == effects_eyecare.kdl ]]
+[[ $(<"$state_home/niri/nyxniri-eyecare") == noctalia ]]
+[[ $(tail -n 1 "$mock_log") == 'noctalia msg nightlight-force-toggle' ]]
+
+XDG_SESSION_DESKTOP=NyxNiri NIRI_CONFIG="$config_home/niri/config.kdl" \
+  "$script" >/dev/null
+[[ $(readlink "$nyxniri_dir/effects.kdl") == effects_normal.kdl ]]
+[[ ! -e "$state_home/niri/nyxniri-eyecare" ]]
+[[ $(tail -n 1 "$mock_log") == 'noctalia msg nightlight-force-toggle' ]]
+
+MOCK_NOCTALIA_FAIL=1 XDG_SESSION_DESKTOP=NyxNiri \
+  NIRI_CONFIG="$config_home/niri/config.kdl" \
   "$script" >/dev/null 2>&1 && exit 1
 [[ $(readlink "$nyxniri_dir/effects.kdl") == effects_normal.kdl ]]
 [[ ! -e "$state_home/niri/nyxniri-eyecare" ]]
