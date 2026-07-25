@@ -17,6 +17,12 @@ fi
 
 mkdir -p "$state_dir"
 
+noctalia_force_state() {
+  command -v python3 >/dev/null 2>&1 || return 1
+  noctalia config export full 2>/dev/null |
+    python3 -c 'import sys, tomllib; print("forced" if tomllib.load(sys.stdin.buffer).get("nightlight", {}).get("force", False) else "unforced")'
+}
+
 if [[ -e "$state_file" ]]; then
   next_effect=effects_normal.kdl
   previous_effect=effects_eyecare.kdl
@@ -29,7 +35,11 @@ else
   previous_night_state=unknown
 
   if [[ "$shell_backend" == noctalia ]]; then
-    previous_night_state=noctalia
+    previous_night_state=$(noctalia_force_state) || {
+      printf '%s\n' 'NyxNiri: 无法读取 Noctalia 夜灯状态，未更改护眼模式。' >&2
+      exit 1
+    }
+    previous_night_state="noctalia-$previous_night_state"
   elif command -v dms >/dev/null 2>&1; then
     night_status=$(dms ipc call night status 2>/dev/null || true)
     case "$night_status" in
@@ -58,7 +68,7 @@ shell_warning=
 if [[ "$next_mode" == eye-care ]]; then
   printf '%s\n' "$previous_night_state" >"$state_file"
 
-  if [[ "$shell_backend" == noctalia ]]; then
+  if [[ "$previous_night_state" == noctalia-unforced ]]; then
     if ! noctalia msg nightlight-force-toggle >/dev/null 2>&1; then
       ln -sfn "$previous_effect" "$effects_link"
       niri msg action load-config-file >/dev/null 2>&1 || true
@@ -71,7 +81,7 @@ if [[ "$next_mode" == eye-care ]]; then
     shell_warning='DMS night mode was unavailable; only the visual effect changed.'
   fi
 else
-  if [[ "$previous_night_state" == noctalia ]]; then
+  if [[ "$previous_night_state" == noctalia-unforced ]]; then
     if ! noctalia msg nightlight-force-toggle >/dev/null 2>&1; then
       ln -sfn "$previous_effect" "$effects_link"
       niri msg action load-config-file >/dev/null 2>&1 || true
@@ -79,6 +89,8 @@ else
         'NyxNiri: Noctalia night light could not be restored; eye-care mode remains active.' >&2
       exit 1
     fi
+    night_action=
+  elif [[ "$previous_night_state" == noctalia-forced ]]; then
     night_action=
   else
   case "$previous_night_state" in
@@ -88,7 +100,7 @@ else
   esac
   fi
 
-  if [[ "$previous_night_state" != noctalia && -n "$night_action" ]] &&
+  if [[ "$previous_night_state" != noctalia-* && -n "$night_action" ]] &&
     { ! command -v dms >/dev/null 2>&1 ||
       ! dms ipc call night "$night_action" >/dev/null 2>&1; }; then
     ln -sfn "$previous_effect" "$effects_link"

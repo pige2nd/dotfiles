@@ -46,7 +46,7 @@ set +e
 wrapper_status=$?
 set -e
 [[ "$wrapper_status" == 7 ]]
-grep -Fxq 'dms ipc call night disabled' "$mock_log"
+grep -Fxq 'dms ipc call night disable' "$mock_log"
 grep -Fxq 'systemctl --user stop dms.service' "$mock_log"
 grep -Fq "niri-session NIRI_CONFIG=$test_home/.config/niri-nyxniri/config.kdl DESKTOP_SESSION=NyxNiri" "$mock_log"
 grep -Fxq 'systemctl --user unset-environment NIRI_CONFIG XDG_SESSION_DESKTOP DESKTOP_SESSION' "$mock_log"

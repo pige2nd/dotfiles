@@ -55,7 +55,6 @@ scale = 0.9
 [shell]
 font_family = "Noto Sans CJK SC"
 settings_show_advanced = true
-ui_scale = 1.2
 telemetry_enabled = false
 
 [shell.panel]

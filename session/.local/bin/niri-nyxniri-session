@@ -5,7 +5,7 @@ restore_dms() {
   state_home=${XDG_STATE_HOME:-"$HOME/.local/state"}
   state_file="$state_home/niri/nyxniri-eyecare"
   effects_link="$HOME/.config/niri/nyxniri/effects.kdl"
-  if [[ -f "$state_file" && "$(<"$state_file")" == noctalia ]]; then
+  if [[ -f "$state_file" && "$(<"$state_file")" == noctalia-unforced ]]; then
     noctalia msg nightlight-force-toggle >/dev/null 2>&1 || true
   fi
   rm -f "$state_file"
@@ -22,8 +22,9 @@ effects_link="$HOME/.config/niri/nyxniri/effects.kdl"
 if [[ -f "$state_file" ]]; then
   previous_night_state=$(<"$state_file")
   case "$previous_night_state" in
-    enabled|disabled)
-      dms ipc call night "$previous_night_state" >/dev/null 2>&1 || true
+    enabled) dms ipc call night enable >/dev/null 2>&1 || true ;;
+    disabled)
+      dms ipc call night disable >/dev/null 2>&1 || true
       ;;
   esac
   rm -f "$state_file"
