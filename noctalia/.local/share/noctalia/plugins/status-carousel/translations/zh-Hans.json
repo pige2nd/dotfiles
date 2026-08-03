@@ -1,4 +1,6 @@
 {
+  "item.cpu": "CPU",
+  "item.ram": "内存",
   "item.battery": "电量",
   "item.volume": "音量",
   "item.brightness": "亮度",

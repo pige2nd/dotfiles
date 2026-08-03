@@ -1,4 +1,6 @@
 {
+  "item.cpu": "CPU",
+  "item.ram": "Memory",
   "item.battery": "Battery",
   "item.volume": "Volume",
   "item.brightness": "Brightness",

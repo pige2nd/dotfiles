@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+seed="$repo_dir/seeds/noctalia/config.toml.in"
+plugin_dir="$repo_dir/noctalia/.local/share/noctalia/plugins/status-carousel"
+helper="$plugin_dir/status-carousel"
+tab_config="$repo_dir/wezterm/.config/wezterm/tab.lua"
+test_root=$(mktemp -d)
+trap 'rm -rf -- "$test_root"' EXIT
+proc_fixture="$test_root/proc"
+mkdir -p "$proc_fixture"
+
+rg -q '^start = \["vicinae-launcher", "workspaces"(, "active_window")?, "resources-carousel"\]$' "$seed"
+rg -Fq '[widget.resources-carousel]' "$seed"
+rg -Fq 'type = "xx/status-carousel:resources"' "$seed"
+! rg -Fq '[widget.ram]' "$seed"
+
+rg -Fq 'id = "resources"' "$plugin_dir/plugin.toml"
+rg -Fq 'entry = "resources.luau"' "$plugin_dir/plugin.toml"
+test -f "$plugin_dir/resources.luau"
+
+printf '%s\n' \
+  'MemTotal:       1000 kB' \
+  'MemAvailable:    250 kB' >"$proc_fixture/meminfo"
+printf '%s\n' 'cpu 100 0 100 800 0 0 0 0 1000 500' >"$proc_fixture/stat.before"
+printf '%s\n' 'cpu 150 0 150 900 0 0 0 0 2000 1000' >"$proc_fixture/stat.after"
+
+ram_status=$(NYXNIRI_PROC_ROOT="$proc_fixture" "$helper" read ram)
+cpu_status=$(
+  NYXNIRI_PROC_ROOT="$proc_fixture" \
+    NYXNIRI_CPU_STAT_BEFORE="$proc_fixture/stat.before" \
+    NYXNIRI_CPU_STAT_AFTER="$proc_fixture/stat.after" \
+    NYXNIRI_CPU_SAMPLE_SECONDS=0 \
+    "$helper" read cpu
+)
+[[ "$ram_status" == 'ram|75|active' ]]
+[[ "$cpu_status" == 'cpu|50|active' ]]
+
+printf '%s\n' 'MemTotal:       1000 kB' >"$proc_fixture/meminfo"
+if NYXNIRI_PROC_ROOT="$proc_fixture" "$helper" read ram >/dev/null 2>&1; then
+  printf '%s\n' 'RAM reader accepted a fixture without MemAvailable' >&2
+  exit 1
+fi
+printf '%s\n' 'intr 123' >"$proc_fixture/stat.before"
+if NYXNIRI_PROC_ROOT="$proc_fixture" \
+    NYXNIRI_CPU_STAT_BEFORE="$proc_fixture/stat.before" \
+    NYXNIRI_CPU_STAT_AFTER="$proc_fixture/stat.after" \
+    NYXNIRI_CPU_SAMPLE_SECONDS=0 \
+    "$helper" read cpu >/dev/null 2>&1; then
+  printf '%s\n' 'CPU reader accepted a fixture without an aggregate CPU row' >&2
+  exit 1
+fi
+cp "$proc_fixture/stat.after" "$proc_fixture/stat.before"
+if NYXNIRI_PROC_ROOT="$proc_fixture" \
+    NYXNIRI_CPU_STAT_BEFORE="$proc_fixture/stat.before" \
+    NYXNIRI_CPU_STAT_AFTER="$proc_fixture/stat.after" \
+    NYXNIRI_CPU_SAMPLE_SECONDS=0 \
+    "$helper" read cpu >/dev/null 2>&1; then
+  printf '%s\n' 'CPU reader accepted snapshots with no elapsed CPU time' >&2
+  exit 1
+fi
+
+rg -Fq 'tabline_x = {}' "$tab_config"
+rg -Fq 'tabline_y = {}' "$tab_config"
+rg -Fq "tabline_z = { { 'domain'" "$tab_config"
+! rg -q 'memory_percent|memory_cpu|components\\.window\\.cpu' "$tab_config"
+
+printf '%s\n' 'Compact WezTerm and rotating Noctalia resource bars are configured.'

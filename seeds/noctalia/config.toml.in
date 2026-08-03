@@ -28,7 +28,7 @@ margin_ends = 14
 margin_edge = 10
 scale = 1.1
 shadow = false
-start = ["vicinae-launcher", "workspaces", "active_window", "ram"]
+start = ["vicinae-launcher", "workspaces", "active_window", "resources-carousel"]
 center = ["clock"]
 end = ["lyrics", "tray", "wallpaper", "mpvpaper", "status-carousel", "notifications", "session"]
 thickness = 36
@@ -126,12 +126,9 @@ max_length = 260
 min_length = 80
 title_scroll = "always"
 
-[widget.ram]
-type = "sysmon"
-stat = "ram_pct"
-display = "text"
-show_label = true
-label_min_width = 0
+[widget.resources-carousel]
+type = "xx/status-carousel:resources"
+cycle_seconds = 4
 
 [widget.status-carousel]
 type = "xx/status-carousel:status"

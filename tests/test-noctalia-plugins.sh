@@ -41,6 +41,84 @@ run_status_migration() {
     "$migrate_status" >/dev/null
 }
 
+legacy_resource_config="$test_root/legacy-resource.toml"
+cp "$seed" "$legacy_resource_config"
+sed -i \
+  '/^start = .*"resources-carousel"\]$/c\start = ["vicinae-launcher", "workspaces", "ram"]' \
+  "$legacy_resource_config"
+sed -i '/^\[widget\.resources-carousel\]$/,/^$/c\
+[widget.ram]\
+type = "sysmon"\
+stat = "ram_pct"\
+display = "text"\
+show_label = true\
+label_min_width = 0\
+' "$legacy_resource_config"
+run_status_migration "$legacy_resource_config"
+rg -Fq 'start = ["vicinae-launcher", "workspaces", "resources-carousel"]' \
+  "$legacy_resource_config"
+rg -Fq 'type = "xx/status-carousel:resources"' "$legacy_resource_config"
+! rg -Fq '[widget.ram]' "$legacy_resource_config"
+
+legacy_active_window_config="$test_root/legacy-active-window.toml"
+cp "$legacy_resource_config" "$legacy_active_window_config"
+sed -i \
+  '/^start = .*"resources-carousel"\]$/c\start = ["vicinae-launcher", "workspaces", "active_window", "ram"]' \
+  "$legacy_active_window_config"
+sed -i '/^\[widget\.resources-carousel\]$/,/^$/c\
+[widget.ram]\
+type = "sysmon"\
+stat = "ram_pct"\
+' "$legacy_active_window_config"
+run_status_migration "$legacy_active_window_config"
+rg -Fq 'start = ["vicinae-launcher", "workspaces", "active_window", "resources-carousel"]' \
+  "$legacy_active_window_config"
+
+legacy_compact_toml="$test_root/legacy-compact.toml"
+cp "$seed" "$legacy_compact_toml"
+sed -i \
+  '/^start = .*"resources-carousel"\]$/c\start = ["vicinae-launcher", "workspaces", "ram"]' \
+  "$legacy_compact_toml"
+sed -i '/^\[widget\.resources-carousel\]$/,/^$/c\
+[widget.ram]\
+type = "sysmon"\
+stat = "ram_pct"' "$legacy_compact_toml"
+run_status_migration "$legacy_compact_toml"
+rg -Fq '[widget.resources-carousel]' "$legacy_compact_toml"
+rg -Fq '[widget.status-carousel]' "$legacy_compact_toml"
+
+partial_resource_config="$test_root/partial-resource.toml"
+cp "$seed" "$partial_resource_config"
+sed -i \
+  '/^start = .*"resources-carousel"\]$/c\start = ["vicinae-launcher", "workspaces", "ram"]' \
+  "$partial_resource_config"
+partial_hash=$(sha256sum "$partial_resource_config")
+if run_status_migration "$partial_resource_config" 2>/dev/null; then
+  printf '%s\n' 'partially migrated resource layout was accepted' >&2
+  exit 1
+fi
+test "$partial_hash" = "$(sha256sum "$partial_resource_config")"
+
+late_failure_config="$test_root/late-failure.toml"
+cp "$seed" "$late_failure_config"
+sed -i \
+  '/^start = .*"resources-carousel"\]$/c\start = ["vicinae-launcher", "workspaces", "ram"]' \
+  "$late_failure_config"
+sed -i '/^\[widget\.resources-carousel\]$/,/^$/c\
+[widget.ram]\
+type = "sysmon"\
+stat = "ram_pct"\
+' "$late_failure_config"
+sed -i \
+  's/^end = .*/end = ["custom-widget"]/' \
+  "$late_failure_config"
+late_failure_hash=$(sha256sum "$late_failure_config")
+if run_status_migration "$late_failure_config" 2>/dev/null; then
+  printf '%s\n' 'resource migration accepted a custom trailing bar layout' >&2
+  exit 1
+fi
+test "$late_failure_hash" = "$(sha256sum "$late_failure_config")"
+
 missing_setting_config="$test_root/missing-middle-click.toml"
 cp "$seed" "$missing_setting_config"
 sed -i '/^middle_click_opens_widget_settings = false$/d' "$missing_setting_config"

@@ -24,6 +24,7 @@ required_files=(
   noctalia/.config/noctalia/wallpaper-hook.sh
   noctalia/.config/noctalia/mpv-hook.lua
   noctalia/.local/share/noctalia/plugins/status-carousel/plugin.toml
+  noctalia/.local/share/noctalia/plugins/status-carousel/resources.luau
   noctalia/.local/share/noctalia/plugins/status-carousel/widget.luau
   noctalia/.local/share/noctalia/plugins/status-carousel/status-carousel
   session/.local/bin/niri-nyxniri-session
@@ -34,6 +35,7 @@ required_files=(
   scripts/prefetch-noctalia-plugins.sh
   scripts/install-nyxniri-wallpapers.sh
   tests/test-noctalia-plugins.sh
+  tests/test-compact-status-bars.sh
   tests/test-nyxniri-session.sh
   tests/test-session-discoverable.sh
   dms/.config/DankMaterialShell/settings.json
@@ -133,17 +135,16 @@ fi
 
 noctalia_seed="$repo_dir/seeds/noctalia/config.toml.in"
 if [[ -f "$noctalia_seed" ]]; then
-  rg -Fq 'start = ["vicinae-launcher", "workspaces", "active_window", "ram"]' "$noctalia_seed" &&
+  rg -q '^start = \["vicinae-launcher", "workspaces"(, "active_window")?, "resources-carousel"\]$' "$noctalia_seed" &&
     rg -Fq '[widget.vicinae-launcher]' "$noctalia_seed" &&
     rg -Fq 'command = "vicinae toggle"' "$noctalia_seed" &&
     pass 'Noctalia search capsule launches Vicinae' ||
     fail 'Noctalia search capsule does not launch Vicinae'
-  rg -Fq '[widget.ram]' "$noctalia_seed" &&
-    rg -Fq 'stat = "ram_pct"' "$noctalia_seed" &&
-    rg -Fq 'display = "text"' "$noctalia_seed" &&
-    rg -Fq 'label_min_width = 0' "$noctalia_seed" &&
-    pass 'Noctalia left bar has a compact RAM utilization capsule' ||
-    fail 'Noctalia RAM utilization capsule is missing or too wide'
+  rg -Fq '[widget.resources-carousel]' "$noctalia_seed" &&
+    rg -Fq 'type = "xx/status-carousel:resources"' "$noctalia_seed" &&
+    ! rg -Fq '[widget.ram]' "$noctalia_seed" &&
+    pass 'Noctalia left bar rotates CPU and RAM in one capsule' ||
+    fail 'Noctalia resource carousel is missing or duplicated'
   rg -Fq 'center = ["clock"]' "$noctalia_seed" &&
     pass 'Noctalia center bar matches NyxNiri' || fail 'Noctalia center bar differs'
   rg -Fq 'end = ["lyrics", "tray", "wallpaper", "mpvpaper", "status-carousel", "notifications", "session"]' "$noctalia_seed" &&
@@ -374,6 +375,7 @@ for script in \
   session/.local/bin/niri-nyxniri-session \
   tests/verify-desktop.sh \
   tests/test-noctalia-plugins.sh \
+  tests/test-compact-status-bars.sh \
   tests/test-toggle-eyecare.sh \
   tests/test-nyxniri-session.sh \
   tests/test-session-discoverable.sh \
@@ -387,6 +389,12 @@ if "$repo_dir/tests/test-noctalia-plugins.sh" >/dev/null 2>&1; then
   pass 'Noctalia plugin prefetch and compatibility fallback'
 else
   fail 'Noctalia plugin prefetch and compatibility fallback'
+fi
+
+if "$repo_dir/tests/test-compact-status-bars.sh" >/dev/null 2>&1; then
+  pass 'Compact WezTerm and rotating Noctalia resource bars'
+else
+  fail 'Compact WezTerm or rotating Noctalia resource bar'
 fi
 
 if "$repo_dir/tests/test-toggle-eyecare.sh" >/dev/null; then
