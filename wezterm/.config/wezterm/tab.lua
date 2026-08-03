@@ -1,6 +1,8 @@
 local wezterm = require 'wezterm' --[[@as Wezterm]]
+local tab_label = require 'tab-label'
 
 local M = {}
+local max_tab_label_width = 12
 
 function M.apply(config)
   local tabline = wezterm.plugin.require 'https://github.com/michaelbrusegard/tabline.wez'
@@ -13,6 +15,14 @@ function M.apply(config)
 
   local function format_mode(mode)
     return (mode_symbols[mode] or '•') .. ' ' .. mode
+  end
+
+  local function compact_tab_label(label)
+    return tab_label.compact(label, max_tab_label_width)
+  end
+
+  local function compact_active_directory(tab)
+    return tab_label.active_directory(tab, max_tab_label_width)
   end
 
   -- 右侧只保留当前 domain（本机会显示 local）。
@@ -51,6 +61,15 @@ function M.apply(config)
     sections = {
       tabline_a = { { 'mode', fmt = format_mode, padding = { left = 1, right = 0 } } },
       tabline_b = {},
+      tab_active = {
+        { 'index', padding = 0 },
+        compact_active_directory,
+        { 'zoomed', padding = 0 },
+      },
+      tab_inactive = {
+        { 'index', padding = 0 },
+        { 'process', fmt = compact_tab_label, padding = { left = 1, right = 1 } },
+      },
       tabline_x = {},
       tabline_y = {},
       tabline_z = { { 'domain', padding = { left = 0, right = 1 } } },

@@ -6,6 +6,8 @@ seed="$repo_dir/seeds/noctalia/config.toml.in"
 plugin_dir="$repo_dir/noctalia/.local/share/noctalia/plugins/status-carousel"
 helper="$plugin_dir/status-carousel"
 tab_config="$repo_dir/wezterm/.config/wezterm/tab.lua"
+tab_label="$repo_dir/wezterm/.config/wezterm/tab-label.lua"
+tab_label_test="$repo_dir/tests/wezterm-tab-label.lua"
 test_root=$(mktemp -d)
 trap 'rm -rf -- "$test_root"' EXIT
 proc_fixture="$test_root/proc"
@@ -65,5 +67,14 @@ rg -Fq 'tabline_x = {}' "$tab_config"
 rg -Fq 'tabline_y = {}' "$tab_config"
 rg -Fq "tabline_z = { { 'domain'" "$tab_config"
 ! rg -q 'memory_percent|memory_cpu|components\\.window\\.cpu' "$tab_config"
+rg -Fq "local function compact_tab_label(label)" "$tab_config"
+rg -Fq "{ 'index', padding = 0 }" "$tab_config"
+rg -Fq "compact_active_directory," "$tab_config"
+rg -Fq "{ 'process', fmt = compact_tab_label, padding = { left = 1, right = 1 } }" "$tab_config"
+! rg -Fq "{ 'parent'" "$tab_config"
+rg -Fq "wezterm.column_width(label)" "$tab_label"
+rg -Fq "wezterm.truncate_right(label, max_width - 1)" "$tab_label"
+
+NYXNIRI_REPO_DIR="$repo_dir" wezterm --config-file "$tab_label_test" show-keys >/dev/null
 
 printf '%s\n' 'Compact WezTerm and rotating Noctalia resource bars are configured.'
