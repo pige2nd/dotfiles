@@ -1,5 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require 'wezterm' --[[@as Wezterm]]
+local is_windows = wezterm.target_triple:find("windows") ~= nil
 
 -- This table will hold the configuration.
 local config = {}
@@ -17,12 +18,16 @@ end
 -- 配置文件修改后自动重载
 config.automatically_reload_config = true
 
--- 设置zsh
-config.default_prog = { '/usr/bin/zsh', '-l'}
--- 原生 Wayland 与 niri/DMS 的窗口高度协商会把最后一行画到裁剪区外。
--- 使用 XWayland 可让终端内容、圆角和焦点边框保持在同一窗口几何内。
-config.enable_wayland = false
+if is_windows then
+  -- Windows WezTerm 默认从 CMD 进入；需要 Linux 时再打开 WSL。
+  config.default_prog = { "cmd.exe" }
+else
+  -- Ubuntu 笔记本继续使用原来的 zsh。
+  config.default_prog = { "/usr/bin/zsh", "-l" }
 
+  -- 仅 Linux 需要处理 Wayland/XWayland。
+  config.enable_wayland = false
+end
 -- 不使用 WezTerm 自己的版本更新弹窗
 config.check_for_updates = false
 
@@ -33,36 +38,50 @@ config.term = 'xterm-256color'
 -- 字体
 -- =========================================================
 
+-- Windows 使用 SF Mono；Ubuntu 保持原字体。
+local primary_font =
+  is_windows and "SF Mono" or "JetBrainsMono Nerd Font"
+
+-- Windows 当前已有微软雅黑；Ubuntu 使用 Noto CJK。
+local cjk_font =
+  is_windows and "Microsoft YaHei UI" or "Noto Sans Mono CJK SC"
+
 config.font = wezterm.font_with_fallback {
-  { family = 'JetBrainsMono Nerd Font', weight = 'Regular' },
-  'Noto Sans Mono CJK SC',
-  'Noto Color Emoji',
+  { family = primary_font, weight = "Regular" },
+  cjk_font,
+  "Noto Color Emoji",
 }
 
 config.font_size = 12.5
-
--- 字体行高
 config.line_height = 1.08
 
--- 禁用连字
-config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+-- 禁用连字。
+config.harfbuzz_features = {
+  "calt=0",
+  "clig=0",
+  "liga=0",
+}
 
--- 避免粗体过粗
+-- 两个平台分别使用各自主字体的真实字重。
 config.font_rules = {
   {
-    intensity = 'Bold',
+    intensity = "Bold",
     italic = false,
     font = wezterm.font_with_fallback {
-      { family = 'JetBrainsMono Nerd Font', weight = 'DemiBold' },
-      'Noto Sans Mono CJK SC',
+      { family = primary_font, weight = "DemiBold" },
+      cjk_font,
     },
   },
   {
-    intensity = 'Normal',
+    intensity = "Normal",
     italic = true,
     font = wezterm.font_with_fallback {
-      { family = 'JetBrainsMono Nerd Font', weight = 'Regular', style = 'Italic' },
-      'Noto Sans Mono CJK SC',
+      {
+        family = primary_font,
+        weight = "Regular",
+        style = "Italic",
+      },
+      cjk_font,
     },
   },
 }

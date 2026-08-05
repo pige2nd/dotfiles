@@ -60,6 +60,10 @@ function M.apply(config)
     return (mode_symbols[mode] or '•') .. ' ' .. mode
   end
 
+  local function format_domain(domain)
+    return domain == 'Ubuntu' and 'WSL' or domain
+  end
+
   -- 基于官方默认配置，仅隐藏 workspace 模块，避免显示无意义的 "default"。
   tabline.setup {
     options = {
@@ -98,10 +102,20 @@ function M.apply(config)
       tabline_b = {},
       tabline_x = { resource_lead },
       tabline_y = { memory_cpu },
-      tabline_z = { { 'domain', padding = { left = 0, right = 1 } } },
+      tabline_z = {
+        {
+          'domain',
+          domain_to_icon = { wsl = wezterm.nerdfonts.linux_ubuntu },
+          fmt = format_domain,
+          padding = { left = 0, right = 1 },
+        },
+      },
     },
   }
   tabline.apply_to_config(config)
+
+  -- tabline.wez 默认隐藏系统标题栏；Windows 下恢复原生窗口按钮。
+  config.window_decorations = 'TITLE | RESIZE'
 end
 
 return M
