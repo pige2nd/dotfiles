@@ -61,18 +61,22 @@ config.term = 'xterm-256color'
 -- 字体
 -- =========================================================
 
--- Windows 使用 SF Mono；Ubuntu 保持原字体。
-local primary_font =
-  is_windows and "SF Mono" or "JetBrainsMono Nerd Font"
+-- 两个平台的英文、数字和代码统一使用 SF Mono。
+local primary_font = "SF Mono"
 
--- Windows 当前已有微软雅黑；Ubuntu 使用 Noto CJK。
+-- 中文字体按平台选择。
 local cjk_font =
-  is_windows and "Microsoft YaHei UI" or "Noto Sans Mono CJK SC"
+  is_windows and "Microsoft YaHei UI" or "PingFang SC"
+
+-- 图标和 Emoji 使用明确的 fallback，避免依赖主字体是否带有对应字形。
+local symbol_font = "Symbols Nerd Font Mono"
+local emoji_font = "Noto Color Emoji"
 
 config.font = wezterm.font_with_fallback {
   { family = primary_font, weight = "Regular" },
   cjk_font,
-  "Noto Color Emoji",
+  symbol_font,
+  emoji_font,
 }
 
 config.font_size = 12.5
@@ -93,6 +97,8 @@ config.font_rules = {
     font = wezterm.font_with_fallback {
       { family = primary_font, weight = "DemiBold" },
       cjk_font,
+      symbol_font,
+      emoji_font,
     },
   },
   {
@@ -105,6 +111,8 @@ config.font_rules = {
         style = "Italic",
       },
       cjk_font,
+      symbol_font,
+      emoji_font,
     },
   },
 }
