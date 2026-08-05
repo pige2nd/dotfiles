@@ -1,5 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require 'wezterm' --[[@as Wezterm]]
+local is_windows = wezterm.target_triple:find('windows') ~= nil
 
 -- This table will hold the configuration.
 local config = {}
@@ -17,11 +18,39 @@ end
 -- 配置文件修改后自动重载
 config.automatically_reload_config = true
 
--- 设置zsh
-config.default_prog = { '/usr/bin/zsh', '-l'}
--- 原生 Wayland 与 niri/DMS 的窗口高度协商会把最后一行画到裁剪区外。
--- 使用 XWayland 可让终端内容、圆角和焦点边框保持在同一窗口几何内。
-config.enable_wayland = false
+if is_windows then
+  -- Windows 默认进入 CMD；需要 Linux 时再从 Launcher 打开 WSL。
+  config.default_prog = { 'cmd.exe' }
+
+  -- 只展示常用入口，避免与 WezTerm 自动生成的 domain 列表重复。
+  config.launch_menu = {
+    {
+      label = 'CMD',
+      args = { 'cmd.exe' },
+    },
+    {
+      label = 'PowerShell',
+      args = { 'powershell.exe', '-NoLogo' },
+    },
+    {
+      label = 'WSL (Ubuntu)',
+      domain = { DomainName = 'WSL:Ubuntu' },
+    },
+  }
+
+  -- 从 Windows 文件夹打开 WSL 时也始终落到 Linux 用户主目录。
+  local wsl_domains = wezterm.default_wsl_domains()
+  for _, domain in ipairs(wsl_domains) do
+    domain.default_cwd = '~'
+  end
+  config.wsl_domains = wsl_domains
+else
+  config.default_prog = { '/usr/bin/zsh', '-l' }
+
+  -- 原生 Wayland 与 niri/DMS 的窗口高度协商会把最后一行画到裁剪区外。
+  -- 使用 XWayland 可让终端内容、圆角和焦点边框保持在同一窗口几何内。
+  config.enable_wayland = false
+end
 
 -- 不使用 WezTerm 自己的版本更新弹窗
 config.check_for_updates = false
@@ -33,11 +62,23 @@ config.term = 'xterm-256color'
 -- 字体
 -- =========================================================
 
-config.font = wezterm.font_with_fallback {
-  { family = 'JetBrainsMono Nerd Font', weight = 'Regular' },
-  'Noto Sans Mono CJK SC',
-  'Noto Color Emoji',
-}
+local primary_font = 'SF Mono'
+local cjk_font =
+  is_windows and 'Microsoft YaHei UI' or 'Noto Sans Mono CJK SC'
+local symbol_font = 'Symbols Nerd Font Mono'
+local emoji_font = 'Noto Color Emoji'
+
+local function font_with_fallback(primary)
+  return wezterm.font_with_fallback {
+    primary,
+    cjk_font,
+    symbol_font,
+    emoji_font,
+  }
+end
+
+config.font =
+  font_with_fallback { family = primary_font, weight = 'Regular' }
 
 config.font_size = 12.5
 
@@ -45,24 +86,29 @@ config.font_size = 12.5
 config.line_height = 1.08
 
 -- 禁用连字
-config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+config.harfbuzz_features = {
+  'calt=0',
+  'clig=0',
+  'liga=0',
+}
 
--- 避免粗体过粗
+-- 使用 SF Mono 自带的真实粗体和斜体，其他字符继续走相同回退链。
 config.font_rules = {
   {
     intensity = 'Bold',
     italic = false,
-    font = wezterm.font_with_fallback {
-      { family = 'JetBrainsMono Nerd Font', weight = 'DemiBold' },
-      'Noto Sans Mono CJK SC',
+    font = font_with_fallback {
+      family = primary_font,
+      weight = 'DemiBold',
     },
   },
   {
     intensity = 'Normal',
     italic = true,
-    font = wezterm.font_with_fallback {
-      { family = 'JetBrainsMono Nerd Font', weight = 'Regular', style = 'Italic' },
-      'Noto Sans Mono CJK SC',
+    font = font_with_fallback {
+      family = primary_font,
+      weight = 'Regular',
+      style = 'Italic',
     },
   },
 }
@@ -84,8 +130,8 @@ config.window_padding = {
 -- 使用桌面环境自己的独立标题栏和窗口按钮。
 config.window_decorations = 'TITLE | RESIZE'
 
--- 关闭窗口时确认，避免误关掉整组标签页
-config.window_close_confirmation = 'AlwaysPrompt'
+-- 点击系统关闭按钮时直接退出；pane/tab 快捷键仍各自要求确认。
+config.window_close_confirmation = 'NeverPrompt'
 
 -- 标签 / pane 关闭时也始终确认；默认情况下 bash、zsh、tmux 等进程会跳过确认。
 config.skip_close_confirmation_for_processes_named = {}

@@ -17,6 +17,10 @@ function M.apply(config)
     return (mode_symbols[mode] or '•') .. ' ' .. mode
   end
 
+  local function format_domain(domain)
+    return domain == 'Ubuntu' and 'WSL' or domain
+  end
+
   local function compact_tab_label(label)
     return tab_label.compact(label, max_tab_label_width)
   end
@@ -72,10 +76,20 @@ function M.apply(config)
       },
       tabline_x = {},
       tabline_y = {},
-      tabline_z = { { 'domain', padding = { left = 0, right = 1 } } },
+      tabline_z = {
+        {
+          'domain',
+          domain_to_icon = { wsl = wezterm.nerdfonts.linux_ubuntu },
+          fmt = format_domain,
+          padding = { left = 0, right = 1 },
+        },
+      },
     },
   }
   tabline.apply_to_config(config)
+
+  -- tabline.wez 会改写窗口装饰；两端都恢复系统标题栏与窗口按钮。
+  config.window_decorations = 'TITLE | RESIZE'
 end
 
 return M
