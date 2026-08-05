@@ -110,8 +110,8 @@ config.window_padding = {
 -- 使用桌面环境自己的独立标题栏和窗口按钮。
 config.window_decorations = 'TITLE | RESIZE'
 
--- 关闭窗口时确认，避免误关掉整组标签页
-config.window_close_confirmation = 'AlwaysPrompt'
+-- 点击系统关闭按钮时直接退出，不再显示确认框。
+config.window_close_confirmation = 'NeverPrompt'
 
 -- 标签 / pane 关闭时也始终确认；默认情况下 bash、zsh、tmux 等进程会跳过确认。
 config.skip_close_confirmation_for_processes_named = {}
