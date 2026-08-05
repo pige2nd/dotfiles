@@ -31,11 +31,13 @@ required_files=(
   session-files/niri-nyxniri.desktop
   scripts/configure-noctalia-status-carousel.sh
   scripts/install-nyxniri-system.sh
+  scripts/install-system-sleep.sh
   scripts/install-nyxniri-deps.sh
   scripts/prefetch-noctalia-plugins.sh
   scripts/install-nyxniri-wallpapers.sh
   tests/test-noctalia-plugins.sh
   tests/test-compact-status-bars.sh
+  tests/test-system-sleep.sh
   tests/test-nyxniri-session.sh
   tests/test-session-discoverable.sh
   dms/.config/DankMaterialShell/settings.json
@@ -46,6 +48,7 @@ required_files=(
   rime/.local/share/fcitx5/rime/rime_mint.custom.yaml
   applications/.local/share/applications/wechat.desktop
   systemd/.config/systemd/user/vicinae.service
+  system-files/systemd/sleep.conf.d/99-local-deep.conf
   manifests/apt-packages.txt
   manifests/vicinae-extensions.txt
   patches/dms-notification-timeout.patch
@@ -368,6 +371,7 @@ esac
 for script in \
   install.sh \
   scripts/install-nyxniri-system.sh \
+  scripts/install-system-sleep.sh \
   scripts/install-nyxniri-deps.sh \
   scripts/configure-noctalia-status-carousel.sh \
   scripts/prefetch-noctalia-plugins.sh \
@@ -376,6 +380,7 @@ for script in \
   tests/verify-desktop.sh \
   tests/test-noctalia-plugins.sh \
   tests/test-compact-status-bars.sh \
+  tests/test-system-sleep.sh \
   tests/test-toggle-eyecare.sh \
   tests/test-nyxniri-session.sh \
   tests/test-session-discoverable.sh \
@@ -395,6 +400,12 @@ if "$repo_dir/tests/test-compact-status-bars.sh" >/dev/null 2>&1; then
   pass 'Compact WezTerm and rotating Noctalia resource bars'
 else
   fail 'Compact WezTerm or rotating Noctalia resource bar'
+fi
+
+if "$repo_dir/tests/test-system-sleep.sh" >/dev/null 2>&1; then
+  pass 'systemd deep suspend is installed and active'
+else
+  fail 'systemd deep suspend is not installed and active'
 fi
 
 if "$repo_dir/tests/test-toggle-eyecare.sh" >/dev/null; then

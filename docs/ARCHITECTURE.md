@@ -36,6 +36,7 @@
 - Niri 快捷键覆盖通过 dms keybinds 写入，避免下次生成时丢失。
 - NyxNiri 融合层只使用不冲突的 `Super+Ctrl+N` 切换护眼模式；已有 DMS 快捷键保持原样。
 - DMS 的系统级通知补丁单独保存，系统升级后由引导脚本校验并重放。
+- `system-files/systemd/sleep.conf.d/99-local-deep.conf` 是非 Stow 的系统级挂起策略，由 `scripts/install-system-sleep.sh` 校验硬件支持后安装到 `/etc`。
 - 运行数据、缓存、历史记录、密码、令牌和私钥不进仓库。
 
 ## NyxNiri 会话
