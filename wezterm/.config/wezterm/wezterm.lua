@@ -22,6 +22,22 @@ if is_windows then
   -- Windows WezTerm 默认从 CMD 进入；需要 Linux 时再打开 WSL。
   config.default_prog = { "cmd.exe" }
 
+  -- Windows Launcher 固定为三个常用入口，避免与自动 domain 列表重复。
+  config.launch_menu = {
+    {
+      label = "CMD",
+      args = { "cmd.exe" },
+    },
+    {
+      label = "PowerShell",
+      args = { "powershell.exe", "-NoLogo" },
+    },
+    {
+      label = "WSL (Ubuntu)",
+      domain = { DomainName = "WSL:Ubuntu" },
+    },
+  }
+
   -- 无论从哪个 Windows 目录选择 WSL，都从 Linux 用户主目录开始。
   local wsl_domains = wezterm.default_wsl_domains()
   for _, domain in ipairs(wsl_domains) do

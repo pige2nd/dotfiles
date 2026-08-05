@@ -2,6 +2,12 @@ local wezterm = require 'wezterm' --[[@as Wezterm]]
 
 local M = {}
 
+local is_windows = wezterm.target_triple:find('windows') ~= nil
+local launcher_action = wezterm.action.ShowLauncher
+if is_windows then
+  launcher_action = wezterm.action.ShowLauncherArgs { flags = 'LAUNCH_MENU_ITEMS' }
+end
+
 local toggle_file = wezterm.config_dir .. '/wezterm_toggle'
 local toggle_key = { key = '0', mods = 'CTRL|ALT' }
 
@@ -115,7 +121,7 @@ local keys = {
   -- ━━ 搜索 / 命令面板 / 启动器 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   { key = 'f', mods = 'CTRL|SHIFT', action = wezterm.action.Search { CaseInSensitiveString = '' } },
   { key = 'p', mods = 'CTRL|SHIFT', action = wezterm.action.ActivateCommandPalette },
-  { key = 'l', mods = 'CTRL|SHIFT', action = wezterm.action.ShowLauncher },
+  { key = 'l', mods = 'CTRL|SHIFT', action = launcher_action },
 
   -- ━━ 字体缩放 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   { key = '=', mods = 'CTRL', action = wezterm.action.IncreaseFontSize },
@@ -146,9 +152,7 @@ local leader_keys = {
   { key = 'p', action = wezterm.action.ActivateTabRelative(-1) },
   { key = '[', action = wezterm.action.ActivateCopyMode },
   { key = ']', action = wezterm.action.Search { CaseInSensitiveString = '' } },
-  { key = 'l', action = wezterm.action.ShowLauncherArgs {
-    flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS',
-  }},
+  { key = 'l', action = launcher_action },
 
   -- 分屏
   { key = '|', mods = 'SHIFT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
