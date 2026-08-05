@@ -21,6 +21,13 @@ config.automatically_reload_config = true
 if is_windows then
   -- Windows WezTerm 默认从 CMD 进入；需要 Linux 时再打开 WSL。
   config.default_prog = { "cmd.exe" }
+
+  -- 无论从哪个 Windows 目录选择 WSL，都从 Linux 用户主目录开始。
+  local wsl_domains = wezterm.default_wsl_domains()
+  for _, domain in ipairs(wsl_domains) do
+    domain.default_cwd = "~"
+  end
+  config.wsl_domains = wsl_domains
 else
   -- Ubuntu 笔记本继续使用原来的 zsh。
   config.default_prog = { "/usr/bin/zsh", "-l" }
