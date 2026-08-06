@@ -8,8 +8,6 @@ helper="$plugin_dir/status-carousel"
 wezterm_config="$repo_dir/wezterm/.config/wezterm/wezterm.lua"
 wezterm_mappings="$repo_dir/wezterm/.config/wezterm/mappings.lua"
 tab_config="$repo_dir/wezterm/.config/wezterm/tab.lua"
-tab_label="$repo_dir/wezterm/.config/wezterm/tab-label.lua"
-tab_label_test="$repo_dir/tests/wezterm-tab-label.lua"
 test_root=$(mktemp -d)
 trap 'rm -rf -- "$test_root"' EXIT
 proc_fixture="$test_root/proc"
@@ -65,20 +63,17 @@ if NYXNIRI_PROC_ROOT="$proc_fixture" \
   exit 1
 fi
 
-rg -Fq 'tabline_x = {}' "$tab_config"
-rg -Fq 'tabline_y = {}' "$tab_config"
-rg -Uq "tabline_z = \\{\n[[:space:]]+\\{\n[[:space:]]+'domain'," "$tab_config"
-rg -Fq 'domain_to_icon = { wsl = wezterm.nerdfonts.linux_ubuntu }' "$tab_config"
-rg -Fq 'fmt = format_domain' "$tab_config"
+rg -Fq "wezterm.plugin.require 'https://github.com/yriveiro/wezterm-tabs'" "$tab_config"
+rg -Fq 'tabs.apply_to_config(config, {' "$tab_config"
+rg -Fq 'wezterm.color.get_builtin_schemes()[config.color_scheme]' "$tab_config"
+rg -Fq 'config.color_schemes[config.color_scheme] = scheme' "$tab_config"
+rg -Fq 'tab_bar_at_bottom = false' "$tab_config"
+rg -Fq 'hide_tab_bar_if_only_one_tab = false' "$tab_config"
+rg -Fq 'tab_max_width = 24' "$tab_config"
+rg -Uq 'zoom_indicator = \{\n[[:space:]]+enabled = false' "$tab_config"
+rg -Fq 'config.show_new_tab_button_in_tab_bar = true' "$tab_config"
 rg -Fq "config.window_decorations = 'TITLE | RESIZE'" "$tab_config"
-! rg -q 'memory_percent|memory_cpu|components\\.window\\.cpu' "$tab_config"
-rg -Fq "local function compact_tab_label(label)" "$tab_config"
-rg -Fq "{ 'index', padding = 0 }" "$tab_config"
-rg -Fq "compact_active_directory," "$tab_config"
-rg -Fq "{ 'process', fmt = compact_tab_label, padding = { left = 1, right = 1 } }" "$tab_config"
-! rg -Fq "{ 'parent'" "$tab_config"
-rg -Fq "wezterm.column_width(label)" "$tab_label"
-rg -Fq "wezterm.truncate_right(label, max_width - 1)" "$tab_label"
+! rg -q 'wezterm\.on|update-status|status_update_interval' "$tab_config"
 
 rg -Fq "local primary_font = 'SF Mono'" "$wezterm_config"
 rg -Fq "is_windows and 'Microsoft YaHei UI' or 'Noto Sans Mono CJK SC'" "$wezterm_config"
@@ -97,6 +92,4 @@ rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
 rg -Fq "flags = 'LAUNCH_MENU_ITEMS'" "$wezterm_mappings"
 rg -Fq "flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS'" "$wezterm_mappings"
 
-NYXNIRI_REPO_DIR="$repo_dir" wezterm --config-file "$tab_label_test" show-keys >/dev/null
-
-printf '%s\n' 'Compact WezTerm and rotating Noctalia resource bars are configured.'
+printf '%s\n' 'Static wezterm-tabs and rotating Noctalia resource bars are configured.'

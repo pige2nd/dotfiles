@@ -2,7 +2,7 @@
 
 用于在多台电脑之间同步 Niri 桌面与终端配置。目前维护：
 
-- `wezterm`：WezTerm 配置、tabline 外观、快捷键和颜色
+- `wezterm`：WezTerm 配置、静态 Powerline 标签栏、快捷键和颜色
 - `zsh`：Zsh 环境、插件清单、别名、fzf、zoxide
 - `zsh/.config/starship.toml`：Starship 提示符配置
 - `niri`、`dms`：Niri 与 DMS 原生栏/桌面外壳
@@ -26,7 +26,7 @@ cd ~/dotfiles
 ```
 
 `zsh` 首次启动时会按 `.zsh_plugins.txt` 自动安装 Antidote 插件；
-WezTerm 首次加载时会自动获取 `tabline.wez` 插件。
+WezTerm 首次加载时会自动获取 `wezterm-tabs` 插件。
 
 登录 Niri 后可按 `Super+Ctrl+N` 切换护眼模式。它会联动 DMS 夜间色温，
 并在“不透明、无模糊”和默认视觉效果之间切换；`Super+N` 仍是 DMS 通知中心。

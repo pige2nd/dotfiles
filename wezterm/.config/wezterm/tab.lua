@@ -1,94 +1,40 @@
 local wezterm = require 'wezterm' --[[@as Wezterm]]
-local tab_label = require 'tab-label'
 
 local M = {}
-local max_tab_label_width = 12
 
 function M.apply(config)
-  local tabline = wezterm.plugin.require 'https://github.com/michaelbrusegard/tabline.wez'
+  local tabs =
+    wezterm.plugin.require 'https://github.com/yriveiro/wezterm-tabs'
 
-  local mode_symbols = {
-    NORMAL = '',
-    COPY = '',
-    SEARCH = '',
-  }
+  -- 插件只在 color_schemes 表中查找主题；把当前 WezTerm 内置主题
+  -- 显式注册进去，避免 format-tab-title 在运行时读取到 nil。
+  local scheme =
+    assert(wezterm.color.get_builtin_schemes()[config.color_scheme])
+  config.color_schemes = config.color_schemes or {}
+  config.color_schemes[config.color_scheme] = scheme
 
-  local function format_mode(mode)
-    return (mode_symbols[mode] or '•') .. ' ' .. mode
-  end
-
-  local function format_domain(domain)
-    return domain == 'Ubuntu' and 'WSL' or domain
-  end
-
-  local function compact_tab_label(label)
-    return tab_label.compact(label, max_tab_label_width)
-  end
-
-  local function compact_active_directory(tab)
-    return tab_label.active_directory(tab, max_tab_label_width)
-  end
-
-  -- 右侧只保留当前 domain（本机会显示 local）。
-  tabline.setup {
-    options = {
-      theme_overrides = {
-        normal_mode = {
-          x = { fg = '#cdd6f4', bg = '#1e1e2e' },
-          y = { fg = '#cdd6f4', bg = '#313244' },
-          z = { fg = '#1e1e2e', bg = '#89b4fa' },
-        },
-        copy_mode = {
-          x = { fg = '#cdd6f4', bg = '#1e1e2e' },
-          y = { fg = '#cdd6f4', bg = '#313244' },
-          z = { fg = '#1e1e2e', bg = '#89b4fa' },
-        },
-        search_mode = {
-          x = { fg = '#cdd6f4', bg = '#1e1e2e' },
-          y = { fg = '#cdd6f4', bg = '#313244' },
-          z = { fg = '#1e1e2e', bg = '#89b4fa' },
-        },
-      },
-      section_separators = {
-        left = wezterm.nerdfonts.ple_right_half_circle_thick,
-        right = wezterm.nerdfonts.ple_left_half_circle_thick,
-      },
-      component_separators = {
-        left = wezterm.nerdfonts.ple_right_half_circle_thin,
-        right = '',
-      },
-      tab_separators = {
-        left = wezterm.nerdfonts.ple_right_half_circle_thick,
-        right = wezterm.nerdfonts.ple_left_half_circle_thick,
-      },
+  tabs.apply_to_config(config, {
+    tabs = {
+      tab_bar_at_bottom = false,
+      hide_tab_bar_if_only_one_tab = false,
+      tab_max_width = 24,
+      unzoom_on_switch_pane = true,
     },
-    sections = {
-      tabline_a = { { 'mode', fmt = format_mode, padding = { left = 1, right = 0 } } },
-      tabline_b = {},
-      tab_active = {
-        { 'index', padding = 0 },
-        compact_active_directory,
-        { 'zoomed', padding = 0 },
-      },
-      tab_inactive = {
-        { 'index', padding = 0 },
-        { 'process', fmt = compact_tab_label, padding = { left = 1, right = 1 } },
-      },
-      tabline_x = {},
-      tabline_y = {},
-      tabline_z = {
-        {
-          'domain',
-          domain_to_icon = { wsl = wezterm.nerdfonts.linux_ubuntu },
-          fmt = format_domain,
-          padding = { left = 0, right = 1 },
+    ui = {
+      tab = {
+        -- 不读取 mux pane 状态，只显示静态的索引、图标和标题。
+        zoom_indicator = {
+          enabled = false,
+          type = 'icon',
         },
       },
     },
-  }
-  tabline.apply_to_config(config)
+  })
 
-  -- tabline.wez 会改写窗口装饰；两端都恢复系统标题栏与窗口按钮。
+  config.show_new_tab_button_in_tab_bar = true
+
+  -- 插件仅注册 format-tab-title，没有周期性 update-status；
+  -- 两端继续使用系统标题栏与窗口按钮。
   config.window_decorations = 'TITLE | RESIZE'
 end
 
