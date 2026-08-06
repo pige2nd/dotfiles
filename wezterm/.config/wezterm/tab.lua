@@ -3,7 +3,7 @@ local tab_title = require 'tab-title'
 
 local M = {}
 local tab_separator = '\u{e0b1}'
-local right_status_text = ' [local] '
+local right_status_text = ' ' .. wezterm.nerdfonts.md_monitor .. ' LOCAL '
 local new_tab_width = 3
 local status_width = wezterm.column_width(right_status_text)
 local active_tab_colors = {
@@ -23,8 +23,9 @@ local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   local palette = config.resolved_palette.tab_bar
   local colors =
     tab.is_active and active_tab_colors or palette.inactive_tab
-  local width = tab_title.chrome_width(
+  local width = tab_title.chrome_width_for_tab(
     max_width,
+    tab.tab_index,
     #tabs,
     config.tab_max_width,
     status_width,

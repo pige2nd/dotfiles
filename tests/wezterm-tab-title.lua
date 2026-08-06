@@ -87,6 +87,24 @@ assert(tab_title.chrome_width(24, 3, 24, 19, 94, 3) == 24)
 assert(tab_title.chrome_width(24, 3, 24, 19, 77, 3) == 18)
 assert(tab_title.chrome_width(17, 8, 24, 19, 92, 3) == 8)
 
+local distributed_widths = {}
+local distributed_total = 0
+for tab_index = 0, 7 do
+  local width = tab_title.chrome_width_for_tab(
+    24,
+    tab_index,
+    8,
+    24,
+    9,
+    71,
+    3
+  )
+  table.insert(distributed_widths, width)
+  distributed_total = distributed_total + width
+end
+assert(table.concat(distributed_widths, ',') == '8,8,8,7,7,7,7,7')
+assert(distributed_total == 71 - 9 - 3)
+
 if wezterm.config_builder then
   return wezterm.config_builder()
 end

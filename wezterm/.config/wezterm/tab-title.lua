@@ -84,7 +84,7 @@ function M.pane_columns(panes)
   return columns
 end
 
-function M.chrome_width(
+local function chrome_layout(
   max_width,
   tab_count,
   tab_max_width,
@@ -93,15 +93,57 @@ function M.chrome_width(
   new_tab_width
 )
   if tab_count <= 0 or window_width <= 0 then
-    return max_width
+    return max_width, 0
   end
 
   local available =
     math.max(window_width - status_width - new_tab_width, tab_count)
-  return math.max(
-    math.min(max_width, tab_max_width, math.floor(available / tab_count)),
-    1
+  local width_cap = math.max(math.min(max_width, tab_max_width), 1)
+  local width = math.min(width_cap, math.floor(available / tab_count))
+  local used_width = math.min(available, width_cap * tab_count)
+  return width, used_width - width * tab_count
+end
+
+function M.chrome_width(
+  max_width,
+  tab_count,
+  tab_max_width,
+  status_width,
+  window_width,
+  new_tab_width
+)
+  local width = chrome_layout(
+    max_width,
+    tab_count,
+    tab_max_width,
+    status_width,
+    window_width,
+    new_tab_width
   )
+  return width
+end
+
+function M.chrome_width_for_tab(
+  max_width,
+  tab_index,
+  tab_count,
+  tab_max_width,
+  status_width,
+  window_width,
+  new_tab_width
+)
+  local width, remainder = chrome_layout(
+    max_width,
+    tab_count,
+    tab_max_width,
+    status_width,
+    window_width,
+    new_tab_width
+  )
+  if tab_index < remainder then
+    return width + 1
+  end
+  return width
 end
 
 return M
