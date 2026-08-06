@@ -69,9 +69,7 @@ rg -Fq "'https://github.com/yriveiro/wezterm-tabs'" "$tab_config"
 rg -Fq "local tab_title = require 'tab-title'" "$tab_config"
 rg -Fq 'local original_on = wezterm.on' "$tab_config"
 rg -Fq "wezterm.on('window-config-reloaded'" "$tab_config"
-rg -Fq "window:set_left_status" "$tab_config"
 rg -Fq "window:set_right_status" "$tab_config"
-rg -Fq "' [NORMAL] '" "$tab_config"
 rg -Fq "' [local] '" "$tab_config"
 rg -Fq "bg_color = '#89b4fa'" "$tab_config"
 rg -Fq "fg_color = '#1e1e2e'" "$tab_config"
@@ -87,6 +85,10 @@ rg -Fq 'tab_max_width = 24' "$tab_config"
 rg -Uq 'zoom_indicator = \{\n[[:space:]]+enabled = false' "$tab_config"
 rg -Fq 'config.show_new_tab_button_in_tab_bar = true' "$tab_config"
 rg -Fq "config.window_decorations = 'TITLE | RESIZE'" "$tab_config"
+if rg -q 'set_left_status|NORMAL|copy-mode-started|copy-mode-finished' "$tab_config"; then
+  printf '%s\n' 'WezTerm still configures a left status block' >&2
+  exit 1
+fi
 if rg -Fq "{ Text = ' ' }" "$tab_config"; then
   printf '%s\n' 'WezTerm tabs still have an explicit inter-tab gap' >&2
   exit 1

@@ -3,11 +3,9 @@ local tab_title = require 'tab-title'
 
 local M = {}
 local tab_separator = '\u{e0b1}'
-local left_status_text = ' [NORMAL] '
 local right_status_text = ' [local] '
 local new_tab_width = 3
-local status_width =
-  wezterm.column_width(left_status_text) + wezterm.column_width(right_status_text)
+local status_width = wezterm.column_width(right_status_text)
 local active_tab_colors = {
   bg_color = '#89b4fa',
   fg_color = '#1e1e2e',
@@ -65,7 +63,6 @@ local function set_static_status(window)
     return wezterm.format(elements)
   end
 
-  window:set_left_status(block(left_status_text))
   window:set_right_status(block(right_status_text))
 end
 
