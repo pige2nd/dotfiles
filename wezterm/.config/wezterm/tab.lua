@@ -2,6 +2,55 @@ local wezterm = require 'wezterm' --[[@as Wezterm]]
 local tab_title = require 'tab-title'
 
 local M = {}
+local tab_separator = '\u{e0b1}'
+
+local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
+  local rendered = callback(
+    tab_title.for_plugin(tab),
+    tabs,
+    panes,
+    config,
+    hover,
+    max_width
+  )
+  local palette = config.resolved_palette.tab_bar
+  local colors = tab.is_active and palette.active_tab or palette.inactive_tab
+
+  return {
+    { Background = { Color = colors.bg_color } },
+    { Foreground = { Color = colors.fg_color } },
+    { Attribute = { Intensity = tab.is_active and 'Bold' or 'Normal' } },
+    {
+      Text = ' '
+        .. tab_title.bracket_from_elements(rendered, tab_separator)
+        .. ' ',
+    },
+    { Background = { Color = palette.background } },
+    { Text = ' ' },
+  }
+end
+
+local function set_static_status(window)
+  local palette = window:effective_config().resolved_palette
+  local active_tab = palette.tab_bar.active_tab
+  local attributes = {
+    { Background = { Color = active_tab.bg_color } },
+    { Foreground = { Color = active_tab.fg_color } },
+    { Attribute = { Intensity = 'Bold' } },
+  }
+
+  local function block(text)
+    local elements = {}
+    for _, attribute in ipairs(attributes) do
+      table.insert(elements, attribute)
+    end
+    table.insert(elements, { Text = text })
+    return wezterm.format(elements)
+  end
+
+  window:set_left_status(block ' [NORMAL] ')
+  window:set_right_status(block ' [local] ')
+end
 
 local function load_tabs()
   -- wezterm-tabs 会把多词标题的第一个词误判为进程名。只在插件注册
@@ -9,8 +58,16 @@ local function load_tabs()
   local original_on = wezterm.on
   wezterm.on = function(event, callback)
     if event == 'format-tab-title' then
-      return original_on(event, function(tab, ...)
-        return callback(tab_title.for_plugin(tab), ...)
+      return original_on(event, function(tab, tabs, panes, config, hover, max_width)
+        return bracket_tab(
+          callback,
+          tab,
+          tabs,
+          panes,
+          config,
+          hover,
+          max_width
+        )
       end)
     end
     return original_on(event, callback)
@@ -30,6 +87,10 @@ end
 function M.apply(config)
   local tabs = load_tabs()
 
+  wezterm.on('window-config-reloaded', function(window)
+    set_static_status(window)
+  end)
+
   -- 插件只在 color_schemes 表中查找主题；把当前 WezTerm 内置主题
   -- 显式注册进去，避免 format-tab-title 在运行时读取到 nil。
   local scheme =
@@ -45,6 +106,9 @@ function M.apply(config)
       unzoom_on_switch_pane = true,
     },
     ui = {
+      separators = {
+        arrow_thin_left = tab_separator,
+      },
       tab = {
         -- 不读取 mux pane 状态，只显示静态的索引、图标和标题。
         zoom_indicator = {
@@ -57,8 +121,7 @@ function M.apply(config)
 
   config.show_new_tab_button_in_tab_bar = true
 
-  -- 插件仅注册 format-tab-title，没有周期性 update-status；
-  -- 两端继续使用系统标题栏与窗口按钮。
+  -- 标签和两端文字都由事件驱动更新，不注册周期性 update-status。
   config.window_decorations = 'TITLE | RESIZE'
 end
 

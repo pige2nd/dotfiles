@@ -30,4 +30,26 @@ local single_word = {
 }
 assert(tab_title.for_plugin(single_word) == single_word)
 
+assert(
+  tab_title.bracket_text(' 2   Build Logs ', '')
+    == '[2 Build Logs]'
+)
+
+assert(
+  tab_title.bracket_from_elements({
+    { Background = { Color = '#000000' } },
+    { Foreground = { Color = '#ffffff' } },
+    { Attribute = { Intensity = 'Bold' } },
+    { Text = ' 2   Build Logs ' },
+    { Text = '' },
+  }, '') == '[2 Build Logs]'
+)
+
+assert(
+  tab_title.bracket_from_elements({
+    { Text = ' 3 Database ' },
+    { Text = '' },
+  }, '') == '[3 Database]'
+)
+
 return wezterm.config_builder()

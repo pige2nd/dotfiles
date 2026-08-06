@@ -31,4 +31,30 @@ function M.for_plugin(tab)
   return tab
 end
 
+function M.bracket_text(rendered_text, separator)
+  local start, finish = rendered_text:find(separator, 1, true)
+  if start then
+    rendered_text =
+      rendered_text:sub(1, start - 1) .. rendered_text:sub(finish + 1)
+  end
+
+  rendered_text =
+    rendered_text:gsub('^%s+', ''):gsub('%s+$', ''):gsub('%s+', ' ')
+  return '[' .. rendered_text .. ']'
+end
+
+function M.bracket_from_elements(elements, separator)
+  local fallback
+  for _, element in ipairs(elements) do
+    if element.Text and element.Text ~= '' then
+      fallback = fallback or element.Text
+      if element.Text:find(separator, 1, true) then
+        return M.bracket_text(element.Text, separator)
+      end
+    end
+  end
+
+  return M.bracket_text(fallback or '?', separator)
+end
+
 return M
