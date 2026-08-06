@@ -1,3 +1,22 @@
+if vim then
+  package.preload.wezterm = function()
+    return {
+      column_width = vim.fn.strdisplaywidth,
+      truncate_right = function(text, width)
+        local result = ''
+        for index = 0, vim.fn.strchars(text) - 1 do
+          local character = vim.fn.strcharpart(text, index, 1)
+          if vim.fn.strdisplaywidth(result .. character) > width then
+            break
+          end
+          result = result .. character
+        end
+        return result
+      end,
+    }
+  end
+end
+
 local wezterm = require 'wezterm'
 
 local repo_dir = assert(os.getenv 'NYXNIRI_REPO_DIR', 'NYXNIRI_REPO_DIR is required')
@@ -52,4 +71,22 @@ assert(
   }, '') == '[3 Database]'
 )
 
-return wezterm.config_builder()
+local wide_tab = tab_title.fit_bracket('[2 Build Logs]', 18)
+assert(wide_tab == ' [2 Build Logs]   ')
+assert(wezterm.column_width(wide_tab) == 18)
+assert(tab_title.fit_bracket('[2 Build Logs]', 10) == ' [2 Buil] ')
+assert(tab_title.fit_bracket('[2 Build Logs]', 3) == '[2]')
+assert(tab_title.fit_bracket('[2 Build Logs]', 0) == '')
+assert(tab_title.fit_bracket('[2 构建日志]', 10) == ' [2 构建] ')
+
+assert(tab_title.pane_columns({
+  { left = 0, width = 40 },
+  { left = 41, width = 39 },
+}) == 80)
+assert(tab_title.chrome_width(24, 3, 24, 19, 94, 3) == 24)
+assert(tab_title.chrome_width(24, 3, 24, 19, 77, 3) == 18)
+assert(tab_title.chrome_width(17, 8, 24, 19, 92, 3) == 8)
+
+if wezterm.config_builder then
+  return wezterm.config_builder()
+end

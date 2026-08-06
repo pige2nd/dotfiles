@@ -3,6 +3,11 @@ local tab_title = require 'tab-title'
 
 local M = {}
 local tab_separator = '\u{e0b1}'
+local left_status_text = ' [NORMAL] '
+local right_status_text = ' [local] '
+local new_tab_width = 3
+local status_width =
+  wezterm.column_width(left_status_text) + wezterm.column_width(right_status_text)
 local active_tab_colors = {
   bg_color = '#89b4fa',
   fg_color = '#1e1e2e',
@@ -20,18 +25,25 @@ local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   local palette = config.resolved_palette.tab_bar
   local colors =
     tab.is_active and active_tab_colors or palette.inactive_tab
+  local width = tab_title.chrome_width(
+    max_width,
+    #tabs,
+    config.tab_max_width,
+    status_width,
+    tab_title.pane_columns(panes),
+    new_tab_width
+  )
 
   return {
     { Background = { Color = colors.bg_color } },
     { Foreground = { Color = colors.fg_color } },
     { Attribute = { Intensity = tab.is_active and 'Bold' or 'Normal' } },
     {
-      Text = ' '
-        .. tab_title.bracket_from_elements(rendered, tab_separator)
-        .. ' ',
+      Text = tab_title.fit_bracket(
+        tab_title.bracket_from_elements(rendered, tab_separator),
+        width
+      ),
     },
-    { Background = { Color = palette.background } },
-    { Text = ' ' },
   }
 end
 
@@ -53,8 +65,8 @@ local function set_static_status(window)
     return wezterm.format(elements)
   end
 
-  window:set_left_status(block ' [NORMAL] ')
-  window:set_right_status(block ' [local] ')
+  window:set_left_status(block(left_status_text))
+  window:set_right_status(block(right_status_text))
 end
 
 local function load_tabs()

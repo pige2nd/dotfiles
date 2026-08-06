@@ -76,6 +76,7 @@ rg -Fq "' [local] '" "$tab_config"
 rg -Fq "bg_color = '#89b4fa'" "$tab_config"
 rg -Fq "fg_color = '#1e1e2e'" "$tab_config"
 rg -Uq 'tab\.is_active and active_tab_colors or[[:space:]]+palette\.inactive_tab' "$tab_config"
+rg -Fq 'tab_title.fit_bracket(' "$tab_config"
 rg -Fq 'arrow_thin_left = tab_separator' "$tab_config"
 rg -Fq 'tabs.apply_to_config(config, {' "$tab_config"
 rg -Fq 'wezterm.color.get_builtin_schemes()[config.color_scheme]' "$tab_config"
@@ -86,6 +87,10 @@ rg -Fq 'tab_max_width = 24' "$tab_config"
 rg -Uq 'zoom_indicator = \{\n[[:space:]]+enabled = false' "$tab_config"
 rg -Fq 'config.show_new_tab_button_in_tab_bar = true' "$tab_config"
 rg -Fq "config.window_decorations = 'TITLE | RESIZE'" "$tab_config"
+if rg -Fq "{ Text = ' ' }" "$tab_config"; then
+  printf '%s\n' 'WezTerm tabs still have an explicit inter-tab gap' >&2
+  exit 1
+fi
 ! rg -q 'update-status|status_update_interval' "$tab_config"
 
 rg -Fq "local primary_font = 'SF Mono'" "$wezterm_config"
@@ -107,5 +112,7 @@ rg -Fq "flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS'" "$wezterm_mappings"
 
 NYXNIRI_REPO_DIR="$repo_dir" \
   "$wezterm_test_bin" --config-file "$tab_title_test" show-keys >/dev/null
+NYXNIRI_REPO_DIR="$repo_dir" \
+  nvim --headless -u NONE -l "$tab_title_test"
 
 printf '%s\n' 'Static wezterm-tabs and rotating Noctalia resource bars are configured.'

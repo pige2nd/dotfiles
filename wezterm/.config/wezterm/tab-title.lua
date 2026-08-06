@@ -1,3 +1,5 @@
+local wezterm = require 'wezterm'
+
 local M = {}
 local title_marker = '\u{2060} '
 
@@ -55,6 +57,51 @@ function M.bracket_from_elements(elements, separator)
   end
 
   return M.bracket_text(fallback or '?', separator)
+end
+
+function M.fit_bracket(label, width)
+  if width <= 0 then
+    return ''
+  end
+  if width == 1 then
+    return wezterm.truncate_right(label, width)
+  end
+
+  local inner = label:match '^%[(.*)%]$' or label
+  local outer_padding = width >= 4 and 2 or 0
+  local inner_width = width - 2 - outer_padding
+  inner = wezterm.truncate_right(inner, inner_width)
+
+  local text = (outer_padding > 0 and ' ' or '') .. '[' .. inner .. ']'
+  return text .. string.rep(' ', width - wezterm.column_width(text))
+end
+
+function M.pane_columns(panes)
+  local columns = 0
+  for _, pane in ipairs(panes or {}) do
+    columns = math.max(columns, (pane.left or 0) + (pane.width or 0))
+  end
+  return columns
+end
+
+function M.chrome_width(
+  max_width,
+  tab_count,
+  tab_max_width,
+  status_width,
+  window_width,
+  new_tab_width
+)
+  if tab_count <= 0 or window_width <= 0 then
+    return max_width
+  end
+
+  local available =
+    math.max(window_width - status_width - new_tab_width, tab_count)
+  return math.max(
+    math.min(max_width, tab_max_width, math.floor(available / tab_count)),
+    1
+  )
 end
 
 return M
