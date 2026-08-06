@@ -3,6 +3,10 @@ local tab_title = require 'tab-title'
 
 local M = {}
 local tab_separator = '\u{e0b1}'
+local active_tab_colors = {
+  bg_color = '#89b4fa',
+  fg_color = '#1e1e2e',
+}
 
 local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   local rendered = callback(
@@ -14,7 +18,8 @@ local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
     max_width
   )
   local palette = config.resolved_palette.tab_bar
-  local colors = tab.is_active and palette.active_tab or palette.inactive_tab
+  local colors =
+    tab.is_active and active_tab_colors or palette.inactive_tab
 
   return {
     { Background = { Color = colors.bg_color } },
