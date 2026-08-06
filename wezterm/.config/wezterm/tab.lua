@@ -1,10 +1,34 @@
 local wezterm = require 'wezterm' --[[@as Wezterm]]
+local tab_title = require 'tab-title'
 
 local M = {}
 
+local function load_tabs()
+  -- wezterm-tabs 会把多词标题的第一个词误判为进程名。只在插件注册
+  -- format-tab-title 时包装它的输入，保留完整标题和原有渲染逻辑。
+  local original_on = wezterm.on
+  wezterm.on = function(event, callback)
+    if event == 'format-tab-title' then
+      return original_on(event, function(tab, ...)
+        return callback(tab_title.for_plugin(tab), ...)
+      end)
+    end
+    return original_on(event, callback)
+  end
+
+  local ok, tabs = pcall(
+    wezterm.plugin.require,
+    'https://github.com/yriveiro/wezterm-tabs'
+  )
+  wezterm.on = original_on
+  if not ok then
+    error(tabs)
+  end
+  return tabs
+end
+
 function M.apply(config)
-  local tabs =
-    wezterm.plugin.require 'https://github.com/yriveiro/wezterm-tabs'
+  local tabs = load_tabs()
 
   -- 插件只在 color_schemes 表中查找主题；把当前 WezTerm 内置主题
   -- 显式注册进去，避免 format-tab-title 在运行时读取到 nil。

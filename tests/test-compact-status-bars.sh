@@ -8,6 +8,8 @@ helper="$plugin_dir/status-carousel"
 wezterm_config="$repo_dir/wezterm/.config/wezterm/wezterm.lua"
 wezterm_mappings="$repo_dir/wezterm/.config/wezterm/mappings.lua"
 tab_config="$repo_dir/wezterm/.config/wezterm/tab.lua"
+tab_title_test="$repo_dir/tests/wezterm-tab-title.lua"
+wezterm_test_bin="${WEZTERM_TEST_BIN:-wezterm}"
 test_root=$(mktemp -d)
 trap 'rm -rf -- "$test_root"' EXIT
 proc_fixture="$test_root/proc"
@@ -63,7 +65,9 @@ if NYXNIRI_PROC_ROOT="$proc_fixture" \
   exit 1
 fi
 
-rg -Fq "wezterm.plugin.require 'https://github.com/yriveiro/wezterm-tabs'" "$tab_config"
+rg -Fq "'https://github.com/yriveiro/wezterm-tabs'" "$tab_config"
+rg -Fq "local tab_title = require 'tab-title'" "$tab_config"
+rg -Fq 'local original_on = wezterm.on' "$tab_config"
 rg -Fq 'tabs.apply_to_config(config, {' "$tab_config"
 rg -Fq 'wezterm.color.get_builtin_schemes()[config.color_scheme]' "$tab_config"
 rg -Fq 'config.color_schemes[config.color_scheme] = scheme' "$tab_config"
@@ -73,7 +77,7 @@ rg -Fq 'tab_max_width = 24' "$tab_config"
 rg -Uq 'zoom_indicator = \{\n[[:space:]]+enabled = false' "$tab_config"
 rg -Fq 'config.show_new_tab_button_in_tab_bar = true' "$tab_config"
 rg -Fq "config.window_decorations = 'TITLE | RESIZE'" "$tab_config"
-! rg -q 'wezterm\.on|update-status|status_update_interval' "$tab_config"
+! rg -q 'update-status|status_update_interval' "$tab_config"
 
 rg -Fq "local primary_font = 'SF Mono'" "$wezterm_config"
 rg -Fq "is_windows and 'Microsoft YaHei UI' or 'Noto Sans Mono CJK SC'" "$wezterm_config"
@@ -91,5 +95,8 @@ rg -Fq "CloseCurrentTab { confirm = true }" "$wezterm_mappings"
 rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
 rg -Fq "flags = 'LAUNCH_MENU_ITEMS'" "$wezterm_mappings"
 rg -Fq "flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS'" "$wezterm_mappings"
+
+NYXNIRI_REPO_DIR="$repo_dir" \
+  "$wezterm_test_bin" --config-file "$tab_title_test" show-keys >/dev/null
 
 printf '%s\n' 'Static wezterm-tabs and rotating Noctalia resource bars are configured.'
