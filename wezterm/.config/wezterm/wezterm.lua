@@ -69,7 +69,7 @@ local primary_font = 'SF Mono'
 local cjk_font = 'Noto Sans Mono CJK SC'
 local emoji_font = 'Noto Color Emoji'
 if is_windows then
-  cjk_font = 'Microsoft YaHei UI'
+  cjk_font = 'PingFang SC'
   emoji_font = 'Segoe UI Emoji'
 elseif is_macos then
   cjk_font = 'PingFang SC'

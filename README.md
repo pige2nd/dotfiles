@@ -45,8 +45,8 @@ Noctalia 专属控件仍由现有 DMS 壁纸与控制中心功能承载。
 
 两端只复用 `wezterm/.config/wezterm`，不运行 Linux 桌面安装脚本。Windows
 默认打开 CMD，并在 Launcher 中提供 PowerShell 与 WSL；macOS 默认打开
-`/bin/zsh`。字体回退分别使用系统自带的中文和 Emoji 字体，SF Mono 需要
-自行安装。
+`/bin/zsh`。Windows 与 macOS 的中文 fallback 统一使用 PingFang SC；Emoji
+仍使用各自的系统字体。SF Mono 与 Windows 上的 PingFang SC 需要自行安装。
 
 ## TODO
 
