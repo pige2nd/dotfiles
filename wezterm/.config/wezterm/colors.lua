@@ -1,10 +1,12 @@
-local wezterm = require 'wezterm' --[[@as Wezterm]]
+local amber_manpage = require 'amber-manpage'
 
 local M = {}
 
 function M.apply(config)
-  -- Catppuccin Mocha 内置主题
-  config.color_scheme = 'Catppuccin Mocha'
+  config.color_schemes = config.color_schemes or {}
+  config.color_schemes['Amber Manpage'] = amber_manpage
+
+  config.color_scheme = 'Amber Manpage'
 end
 
 return M

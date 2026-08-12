@@ -10,9 +10,10 @@ alias g=git
 
 # mask built-ins with better defaults
 alias vi=vim
+alias ls='eza'
 
 # more ways to ls
-alias ll='ls -lh'
+alias ll='eza --long --all --group-directories-first --git --icons=auto'
 alias la='ls -lAh'
 alias ldot='ls -ld .*'
 
