@@ -71,7 +71,7 @@ symbol = ' '
 style = 'none'
 
 [conda]
-format = 'via [conda \($environment\)](bold green) '
+format = 'via [󰌠 \($environment\)](bold green) '
 ignore_base = false
 
 [custom.python_runtime]
