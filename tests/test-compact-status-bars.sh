@@ -131,7 +131,8 @@ rg -Fq "domain.default_cwd = '~'" "$wezterm_config"
 rg -Fq "config.window_close_confirmation = 'NeverPrompt'" "$wezterm_config"
 rg -Fq "config.skip_close_confirmation_for_processes_named = {}" "$wezterm_config"
 rg -Fq "CloseCurrentTab { confirm = true }" "$wezterm_mappings"
-rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
+test "$(rg -Fc "CloseCurrentPane { confirm = false }" "$wezterm_mappings")" -eq 2
+! rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
 rg -Fq "flags = 'LAUNCH_MENU_ITEMS'" "$wezterm_mappings"
 rg -Fq "flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS'" "$wezterm_mappings"
 
