@@ -1,6 +1,14 @@
 local M = {}
 
 local ssh_options_with_value = 'BbcDEeFIiJLlmOoPpQRSWw'
+local local_icons = {
+  WINDOWS = 'fa_windows',
+  MACOS = 'fa_apple',
+  LINUX = 'fa_linux',
+  UBUNTU = 'linux_ubuntu',
+  DEBIAN = 'linux_debian',
+  LOCAL = 'md_monitor',
+}
 
 local function basename(path)
   return (path or ''):gsub('\\', '/'):match '([^/]+)$' or ''
@@ -72,6 +80,13 @@ function M.label(context)
   end
 
   return local_label(context.target_triple)
+end
+
+function M.icon(label)
+  if label:find('^SSH') or label:find('^REMOTE') then
+    return 'md_server_network'
+  end
+  return local_icons[label] or 'fa_linux'
 end
 
 return M

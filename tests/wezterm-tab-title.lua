@@ -81,6 +81,15 @@ assert(domain_status.label {
   cwd_host = 'remote.example.com',
 } == 'SSH remote.example.com')
 
+assert(domain_status.icon('WINDOWS') == 'fa_windows')
+assert(domain_status.icon('MACOS') == 'fa_apple')
+assert(domain_status.icon('LINUX') == 'fa_linux')
+assert(domain_status.icon('UBUNTU') == 'linux_ubuntu')
+assert(domain_status.icon('DEBIAN') == 'linux_debian')
+assert(domain_status.icon('FEDORA') == 'fa_linux')
+assert(domain_status.icon('SSH deploy@192.0.2.10') == 'md_server_network')
+assert(domain_status.icon('REMOTE production') == 'md_server_network')
+
 local function plugin_custom_title(title)
   local _, custom = title:match '^(%S+)%s*%-?%s*%s*(.*)$'
   return custom

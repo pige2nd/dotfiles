@@ -48,7 +48,8 @@ Noctalia 专属控件仍由现有 DMS 壁纸与控制中心功能承载。
 `/bin/zsh`。Windows 与 macOS 的中文 fallback 统一使用 PingFang SC；Emoji
 仍使用各自的系统字体。SF Mono 与 Windows 上的 PingFang SC 需要自行安装。
 右上角状态跟随当前 pane：CMD/PowerShell 显示 `WINDOWS`，WSL 显示具体发行版；
-SSH 能从前台进程或 WezTerm domain 取得目标时，显示具体的用户、主机或 IP。
+SSH 能从前台进程或 WezTerm domain 取得目标时，显示具体的用户、主机或 IP；
+文字左侧同时显示对应的系统、发行版或远程主机图标。
 
 ## TODO
 

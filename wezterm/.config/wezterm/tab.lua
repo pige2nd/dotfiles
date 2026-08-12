@@ -6,11 +6,15 @@ local M = {}
 local tab_separator = '\u{e0b1}'
 local new_tab_width = 3
 local status_widths = {}
-local default_status_width = wezterm.column_width(
-  ' ' .. wezterm.nerdfonts.md_monitor .. ' '
-    .. domain_status.label { target_triple = wezterm.target_triple }
-    .. ' '
-)
+
+local function status_text(label)
+  return ' ' .. wezterm.nerdfonts[domain_status.icon(label)]
+    .. ' ' .. label .. ' '
+end
+
+local default_status_width = wezterm.column_width(status_text(
+  domain_status.label { target_triple = wezterm.target_triple }
+))
 
 local function status_width(tabs)
   for _, candidate in ipairs(tabs) do
@@ -81,8 +85,7 @@ local function set_dynamic_status(window, pane)
     cwd_host = cwd_host(pane),
     target_triple = wezterm.target_triple,
   }
-  local right_status_text =
-    ' ' .. wezterm.nerdfonts.md_monitor .. ' ' .. label .. ' '
+  local right_status_text = status_text(label)
   local pane_id = call_pane(pane, 'pane_id')
   if pane_id then
     status_widths[tostring(pane_id)] = wezterm.column_width(right_status_text)
