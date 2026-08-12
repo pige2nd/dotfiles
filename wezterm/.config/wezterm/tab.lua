@@ -1,11 +1,31 @@
 local wezterm = require 'wezterm' --[[@as Wezterm]]
+local domain_status = require 'domain-status'
 local tab_title = require 'tab-title'
 
 local M = {}
 local tab_separator = '\u{e0b1}'
-local right_status_text = ' ' .. wezterm.nerdfonts.md_monitor .. ' LOCAL '
 local new_tab_width = 3
-local status_width = wezterm.column_width(right_status_text)
+local status_widths = {}
+
+local function status_text(label)
+  return ' ' .. wezterm.nerdfonts[domain_status.icon(label)]
+    .. ' ' .. label .. ' '
+end
+
+local default_status_width = wezterm.column_width(status_text(
+  domain_status.label { target_triple = wezterm.target_triple }
+))
+
+local function status_width(tabs)
+  for _, candidate in ipairs(tabs) do
+    if candidate.is_active and candidate.active_pane then
+      return status_widths[tostring(candidate.active_pane.pane_id)]
+        or default_status_width
+    end
+  end
+  return default_status_width
+end
+
 local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   local rendered = callback(
     tab_title.for_plugin(tab),
@@ -23,7 +43,7 @@ local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
     tab.tab_index,
     #tabs,
     config.tab_max_width,
-    status_width,
+    status_width(tabs),
     tab_title.pane_columns(panes),
     new_tab_width
   )
@@ -41,7 +61,36 @@ local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   }
 end
 
-local function set_static_status(window)
+local function call_pane(pane, method)
+  local ok, value = pcall(function()
+    return pane[method](pane)
+  end)
+  return ok and value or nil
+end
+
+local function cwd_host(pane)
+  local cwd = call_pane(pane, 'get_current_working_dir')
+  if type(cwd) == 'userdata' then
+    return cwd.host
+  end
+  if type(cwd) == 'string' then
+    return cwd:match '^%w+://([^/]+)'
+  end
+end
+
+local function set_dynamic_status(window, pane)
+  local label = domain_status.label {
+    domain_name = call_pane(pane, 'get_domain_name'),
+    process_info = call_pane(pane, 'get_foreground_process_info'),
+    cwd_host = cwd_host(pane),
+    target_triple = wezterm.target_triple,
+  }
+  local right_status_text = status_text(label)
+  local pane_id = call_pane(pane, 'pane_id')
+  if pane_id then
+    status_widths[tostring(pane_id)] = wezterm.column_width(right_status_text)
+  end
+
   local palette = window:effective_config().resolved_palette
   local active_tab = palette.tab_bar.active_tab
   local attributes = {
@@ -97,8 +146,8 @@ end
 function M.apply(config)
   local tabs = load_tabs()
 
-  wezterm.on('window-config-reloaded', function(window)
-    set_static_status(window)
+  wezterm.on('update-right-status', function(window, pane)
+    set_dynamic_status(window, pane)
   end)
 
   -- 插件只在 color_schemes 表中查找主题；把当前 WezTerm 内置主题
@@ -132,7 +181,7 @@ function M.apply(config)
 
   config.show_new_tab_button_in_tab_bar = true
 
-  -- 标签和两端文字都由事件驱动更新，不注册周期性 update-status。
+  -- 标签和右侧环境状态都由事件驱动更新。
   config.window_decorations = 'TITLE | RESIZE'
 end
 

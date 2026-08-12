@@ -109,7 +109,7 @@ local keys = {
 
   -- ━━ 标签页 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   { key = 't', mods = 'CTRL|SHIFT', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
-  { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.CloseCurrentPane { confirm = true } },
+  { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.CloseCurrentPane { confirm = false } },
 
   -- 标签切换
   { key = 'Tab',    mods = 'CTRL',     action = wezterm.action.ActivateTabRelative(1) },
@@ -151,7 +151,7 @@ local leader_keys = {
   -- 标签操作
   { key = 'c', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
   { key = 'X', action = wezterm.action.CloseCurrentTab { confirm = true } },
-  { key = 'x', action = wezterm.action.CloseCurrentPane { confirm = true } },
+  { key = 'x', action = wezterm.action.CloseCurrentPane { confirm = false } },
 
   -- 标签切换
   { key = 'n', action = wezterm.action.ActivateTabRelative(1) },

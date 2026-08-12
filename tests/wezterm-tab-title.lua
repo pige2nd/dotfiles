@@ -20,7 +20,75 @@ end
 local wezterm = require 'wezterm'
 
 local repo_dir = assert(os.getenv 'NYXNIRI_REPO_DIR', 'NYXNIRI_REPO_DIR is required')
+local domain_status =
+  dofile(repo_dir .. '/wezterm/.config/wezterm/domain-status.lua')
 local tab_title = dofile(repo_dir .. '/wezterm/.config/wezterm/tab-title.lua')
+
+assert(domain_status.label {
+  domain_name = 'local',
+  target_triple = 'x86_64-pc-windows-msvc',
+} == 'WINDOWS')
+assert(domain_status.label {
+  domain_name = 'local',
+  process_info = {
+    executable = 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
+    argv = { 'powershell.exe', '-NoLogo' },
+  },
+  target_triple = 'x86_64-pc-windows-msvc',
+} == 'WINDOWS')
+assert(domain_status.label {
+  domain_name = 'local',
+  target_triple = 'aarch64-apple-darwin',
+} == 'MACOS')
+assert(domain_status.label {
+  domain_name = 'local',
+  target_triple = 'x86_64-unknown-linux-gnu',
+} == 'LINUX')
+assert(domain_status.label {
+  domain_name = 'WSL:Ubuntu',
+  target_triple = 'x86_64-pc-windows-msvc',
+} == 'UBUNTU')
+assert(domain_status.label {
+  domain_name = 'WSL:Debian',
+} == 'DEBIAN')
+assert(domain_status.label {
+  domain_name = 'SSH:build-server',
+} == 'SSH build-server')
+assert(domain_status.label {
+  domain_name = 'production',
+} == 'REMOTE production')
+assert(domain_status.label {
+  domain_name = 'local',
+  process_info = {
+    executable = 'C:\\Windows\\System32\\OpenSSH\\ssh.exe',
+    argv = { 'ssh.exe', '-p', '2222', 'deploy@192.0.2.10' },
+  },
+  target_triple = 'x86_64-pc-windows-msvc',
+} == 'SSH deploy@192.0.2.10')
+assert(domain_status.label {
+  domain_name = 'WSL:Ubuntu',
+  process_info = {
+    executable = '/usr/bin/ssh',
+    argv = { 'ssh', '-o', 'ServerAliveInterval=30', 'server-alias' },
+  },
+} == 'SSH server-alias')
+assert(domain_status.label {
+  domain_name = 'local',
+  process_info = {
+    executable = '/usr/bin/ssh',
+    argv = { 'ssh' },
+  },
+  cwd_host = 'remote.example.com',
+} == 'SSH remote.example.com')
+
+assert(domain_status.icon('WINDOWS') == 'fa_windows')
+assert(domain_status.icon('MACOS') == 'fa_apple')
+assert(domain_status.icon('LINUX') == 'fa_linux')
+assert(domain_status.icon('UBUNTU') == 'linux_ubuntu')
+assert(domain_status.icon('DEBIAN') == 'linux_debian')
+assert(domain_status.icon('FEDORA') == 'fa_linux')
+assert(domain_status.icon('SSH deploy@192.0.2.10') == 'md_server_network')
+assert(domain_status.icon('REMOTE production') == 'md_server_network')
 
 local function plugin_custom_title(title)
   local _, custom = title:match '^(%S+)%s*%-?%s*%s*(.*)$'

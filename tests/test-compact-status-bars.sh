@@ -9,6 +9,7 @@ wezterm_config="$repo_dir/wezterm/.config/wezterm/wezterm.lua"
 wezterm_colors="$repo_dir/wezterm/.config/wezterm/colors.lua"
 wezterm_mappings="$repo_dir/wezterm/.config/wezterm/mappings.lua"
 tab_config="$repo_dir/wezterm/.config/wezterm/tab.lua"
+domain_status="$repo_dir/wezterm/.config/wezterm/domain-status.lua"
 tab_title_test="$repo_dir/tests/wezterm-tab-title.lua"
 wezterm_test_bin="${WEZTERM_TEST_BIN:-wezterm}"
 test_root=$(mktemp -d)
@@ -69,10 +70,21 @@ fi
 rg -Fq "'https://github.com/yriveiro/wezterm-tabs'" "$tab_config"
 rg -Fq "local tab_title = require 'tab-title'" "$tab_config"
 rg -Fq 'local original_on = wezterm.on' "$tab_config"
-rg -Fq "wezterm.on('window-config-reloaded'" "$tab_config"
+rg -Fq "wezterm.on('update-right-status'" "$tab_config"
 rg -Fq "window:set_right_status" "$tab_config"
-rg -Fq 'wezterm.nerdfonts.md_monitor' "$tab_config"
-rg -Fq "' LOCAL '" "$tab_config"
+rg -Fq 'wezterm.nerdfonts[domain_status.icon(label)]' "$tab_config"
+rg -Fq "local domain_status = require 'domain-status'" "$tab_config"
+rg -Fq "call_pane(pane, 'get_domain_name')" "$tab_config"
+rg -Fq "call_pane(pane, 'get_foreground_process_info')" "$tab_config"
+rg -Fq "status_widths[tostring(pane_id)]" "$tab_config"
+rg -Fq "return 'WINDOWS'" "$domain_status"
+rg -Fq "return distribution ~= '' and distribution:upper() or 'WSL'" "$domain_status"
+rg -Fq "return target and 'SSH ' .. target or 'SSH'" "$domain_status"
+rg -Fq "return 'REMOTE ' .. domain_name" "$domain_status"
+rg -Fq "WINDOWS = 'fa_windows'" "$domain_status"
+rg -Fq "MACOS = 'fa_apple'" "$domain_status"
+rg -Fq "UBUNTU = 'linux_ubuntu'" "$domain_status"
+rg -Fq "return 'md_server_network'" "$domain_status"
 rg -Fq 'config.resolved_palette.tab_bar' "$tab_config"
 rg -Uq 'tab\.is_active and palette\.active_tab or[[:space:]]+palette\.inactive_tab' "$tab_config"
 rg -Fq 'tab_title.fit_bracket(' "$tab_config"
@@ -95,7 +107,7 @@ if rg -Fq "{ Text = ' ' }" "$tab_config"; then
   printf '%s\n' 'WezTerm tabs still have an explicit inter-tab gap' >&2
   exit 1
 fi
-! rg -q 'update-status|status_update_interval' "$tab_config"
+! rg -q "wezterm.on\('update-status'|status_update_interval" "$tab_config"
 
 rg -Fq "local primary_font = 'SF Mono'" "$wezterm_config"
 rg -Fq "local selected_scheme = 'Amber Manpage'" "$wezterm_colors"
@@ -119,7 +131,8 @@ rg -Fq "domain.default_cwd = '~'" "$wezterm_config"
 rg -Fq "config.window_close_confirmation = 'NeverPrompt'" "$wezterm_config"
 rg -Fq "config.skip_close_confirmation_for_processes_named = {}" "$wezterm_config"
 rg -Fq "CloseCurrentTab { confirm = true }" "$wezterm_mappings"
-rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
+test "$(rg -Fc "CloseCurrentPane { confirm = false }" "$wezterm_mappings")" -eq 2
+! rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
 rg -Fq "flags = 'LAUNCH_MENU_ITEMS'" "$wezterm_mappings"
 rg -Fq "flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS'" "$wezterm_mappings"
 
@@ -128,4 +141,4 @@ NYXNIRI_REPO_DIR="$repo_dir" \
 NYXNIRI_REPO_DIR="$repo_dir" \
   nvim --headless -u NONE -l "$tab_title_test"
 
-printf '%s\n' 'Static wezterm-tabs and rotating Noctalia resource bars are configured.'
+printf '%s\n' 'Dynamic WezTerm domain status and rotating Noctalia resource bars are configured.'
