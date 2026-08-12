@@ -47,11 +47,15 @@ Noctalia 专属控件仍由现有 DMS 壁纸与控制中心功能承载。
 默认打开 CMD，并在 Launcher 中提供 PowerShell 与 WSL；macOS 默认打开
 `/bin/zsh`。Windows 与 macOS 的中文 fallback 统一使用 PingFang SC；Emoji
 仍使用各自的系统字体。SF Mono 与 Windows 上的 PingFang SC 需要自行安装。
+右上角状态跟随当前 pane：CMD/PowerShell 显示 `WINDOWS`，WSL 显示具体发行版；
+SSH 能从前台进程或 WezTerm domain 取得目标时，显示具体的用户、主机或 IP。
 
 ## TODO
 
 - 添加 Yazi 的 `yazi.toml`、`keymap.toml` 和 `theme.toml`；配置目录与 opener
   需要分别覆盖 Unix 和 Windows，完成前不纳入安装脚本。
+- 在真实 SSH 主机上验证右上角远程目标识别；目前只覆盖可重复运行的 argv 与
+  WezTerm domain 映射测试。
 
 ## 日常同步
 
