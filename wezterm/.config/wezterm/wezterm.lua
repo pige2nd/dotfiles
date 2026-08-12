@@ -90,7 +90,7 @@ end
 config.font =
   font_with_fallback { family = primary_font, weight = 'Regular' }
 
-config.font_size = is_macos and 14.0 or 12.5
+config.font_size = is_macos and 15.5 or 12.5
 
 -- 字体行高
 config.line_height = 1.08
