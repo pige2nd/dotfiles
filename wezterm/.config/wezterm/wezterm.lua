@@ -72,6 +72,7 @@ if is_windows then
   cjk_font = 'PingFang SC'
   emoji_font = 'Segoe UI Emoji'
 elseif is_macos then
+  config.font_dirs = { wezterm.home_dir .. '/Library/Fonts' }
   cjk_font = 'PingFang SC'
   emoji_font = 'Apple Color Emoji'
 end
@@ -89,7 +90,7 @@ end
 config.font =
   font_with_fallback { family = primary_font, weight = 'Regular' }
 
-config.font_size = 12.5
+config.font_size = is_macos and 14.0 or 12.5
 
 -- 字体行高
 config.line_height = 1.08
