@@ -5,6 +5,8 @@
 
 # 避免 zsh 为右侧填充额外空格，保证 $fill 对齐准确。
 export ZLE_RPROMPT_INDENT=0
+# 环境名统一交给 Starship，避免 conda activate 再修改左侧提示符。
+export CONDA_CHANGEPS1=false
 eval "$(starship init zsh)"
 
 # 跳过新 shell 的首个提示符，之后每次显示提示符前插入空行。

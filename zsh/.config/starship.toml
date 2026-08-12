@@ -12,7 +12,8 @@ $directory\
 $git_branch\
 $git_status\
 $fill\
-$python\
+$conda\
+${custom.python_runtime}\
 $nodejs\
 $rust\
 $golang\
@@ -69,10 +70,17 @@ deleted = 'x${count}'
 symbol = ' '
 style = 'none'
 
-[python]
-symbol = 'py '
+[conda]
+format = 'via [conda \($environment\)](bold green) '
+ignore_base = false
+
+[custom.python_runtime]
+command = "python --version 2>&1 | awk '{print $2}'"
+when = 'test -n "$CONDA_DEFAULT_ENV" && command -v python >/dev/null 2>&1'
+shell = ['sh']
 style = 'yellow'
-format = 'via [$symbol$version( \($virtualenv\))]($style) '
+format = '[v$output]($style) '
+description = 'Active Python runtime'
 
 [nodejs]
 symbol = 'node '
