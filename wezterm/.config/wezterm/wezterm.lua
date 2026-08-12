@@ -1,6 +1,7 @@
 -- Pull in the wezterm API
 local wezterm = require 'wezterm' --[[@as Wezterm]]
 local is_windows = wezterm.target_triple:find('windows') ~= nil
+local is_macos = wezterm.target_triple:find('apple%-darwin') ~= nil
 
 -- This table will hold the configuration.
 local config = {}
@@ -44,6 +45,8 @@ if is_windows then
     domain.default_cwd = '~'
   end
   config.wsl_domains = wsl_domains
+elseif is_macos then
+  config.default_prog = { '/bin/zsh', '-l' }
 else
   config.default_prog = { '/usr/bin/zsh', '-l' }
 
@@ -63,10 +66,16 @@ config.term = 'xterm-256color'
 -- =========================================================
 
 local primary_font = 'SF Mono'
-local cjk_font =
-  is_windows and 'Microsoft YaHei UI' or 'Noto Sans Mono CJK SC'
-local symbol_font = 'Symbols Nerd Font Mono'
+local cjk_font = 'Noto Sans Mono CJK SC'
 local emoji_font = 'Noto Color Emoji'
+if is_windows then
+  cjk_font = 'PingFang SC'
+  emoji_font = 'Segoe UI Emoji'
+elseif is_macos then
+  cjk_font = 'PingFang SC'
+  emoji_font = 'Apple Color Emoji'
+end
+local symbol_font = 'Symbols Nerd Font Mono'
 
 local function font_with_fallback(primary)
   return wezterm.font_with_fallback {

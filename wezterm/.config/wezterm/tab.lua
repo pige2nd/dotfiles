@@ -6,11 +6,6 @@ local tab_separator = '\u{e0b1}'
 local right_status_text = ' ' .. wezterm.nerdfonts.md_monitor .. ' LOCAL '
 local new_tab_width = 3
 local status_width = wezterm.column_width(right_status_text)
-local active_tab_colors = {
-  bg_color = '#89b4fa',
-  fg_color = '#1e1e2e',
-}
-
 local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   local rendered = callback(
     tab_title.for_plugin(tab),
@@ -22,7 +17,7 @@ local function bracket_tab(callback, tab, tabs, panes, config, hover, max_width)
   )
   local palette = config.resolved_palette.tab_bar
   local colors =
-    tab.is_active and active_tab_colors or palette.inactive_tab
+    tab.is_active and palette.active_tab or palette.inactive_tab
   local width = tab_title.chrome_width_for_tab(
     max_width,
     tab.tab_index,
@@ -108,8 +103,9 @@ function M.apply(config)
 
   -- 插件只在 color_schemes 表中查找主题；把当前 WezTerm 内置主题
   -- 显式注册进去，避免 format-tab-title 在运行时读取到 nil。
-  local scheme =
-    assert(wezterm.color.get_builtin_schemes()[config.color_scheme])
+  local scheme = config.color_schemes[config.color_scheme]
+    or wezterm.color.get_builtin_schemes()[config.color_scheme]
+  assert(scheme, 'Unknown color scheme: ' .. config.color_scheme)
   config.color_schemes = config.color_schemes or {}
   config.color_schemes[config.color_scheme] = scheme
 
