@@ -10,6 +10,7 @@ alias g=git
 
 # mask built-ins with better defaults
 alias vi=vim
+export EZA_COLORS='fi=37:di=1;36:ln=36:ex=1;32:da=35:xx=2;37'
 alias ls='eza'
 
 # more ways to ls
