@@ -72,42 +72,41 @@ symbol = ' '
 style = 'none'
 
 [conda]
-format = '\[\[󰌠 \($environment\)](bold green)\] '
+symbol = ' '
+format = '\[[$symbol\($environment\)](bold green)'
 ignore_base = false
 
 [custom.python_runtime]
-command = "python --version 2>&1 | awk '{print $2}'"
-when = 'test -n "$CONDA_DEFAULT_ENV" && command -v python >/dev/null 2>&1'
+command = "test -n \"$CONDA_DEFAULT_ENV\" && command -v python3 >/dev/null 2>&1 && python3 --version 2>&1 | awk '{print $2}'"
+when = 'true'
 shell = ['sh']
 style = 'yellow'
-format = '\[[v$output]($style)\] '
+format = '( [v$output]($style)\])'
 description = 'Active Python runtime'
 
 [python]
 # WezTerm wezterm.nerdfonts.dev_python
 symbol = ' '
 style = 'yellow'
-format = '\[[$symbol$version]($style)\] '
-# Conda 已由上方模块显示环境名和 Python 版本，避免重复。
-detect_env_vars = ['VIRTUAL_ENV', '!CONDA_DEFAULT_ENV']
+format = '\[[$symbol$version]($style)\]'
 
 [nodejs]
 # WezTerm wezterm.nerdfonts.dev_nodejs_small
 symbol = ' '
 style = 'green'
-format = '\[[$symbol$version]($style)\] '
+format = '\[[$symbol$version]($style)\]'
 
 [rust]
 # WezTerm wezterm.nerdfonts.dev_rust
 symbol = ' '
 style = 'peach'
-format = '\[[$symbol$version]($style)\] '
+format = '\[[$symbol$version]($style)\]'
 
 [golang]
 # WezTerm wezterm.nerdfonts.dev_go
 symbol = ' '
 style = 'teal'
-format = '\[[$symbol$version]($style)\] '
+format = '\[[$symbol$version]($style)\]'
 
 [custom.docker_runtime]
 command = "docker version --format '{{.Client.Version}}'"
@@ -115,7 +114,7 @@ when = 'command -v docker >/dev/null 2>&1'
 shell = ['sh']
 style = 'blue'
 # WezTerm wezterm.nerdfonts.dev_docker
-format = '\[[ v$output]($style)\] '
+format = '\[[ v$output]($style)\]'
 description = 'Docker client runtime'
 
 [cmd_duration]
