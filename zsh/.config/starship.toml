@@ -14,10 +14,11 @@ $git_status\
 $fill\
 $conda\
 ${custom.python_runtime}\
+$python\
 $nodejs\
 $rust\
 $golang\
-$docker_context\
+${custom.docker_runtime}\
 $cmd_duration\
 $line_break\
 $character"""
@@ -82,25 +83,40 @@ style = 'yellow'
 format = '[v$output]($style) '
 description = 'Active Python runtime'
 
+[python]
+# WezTerm wezterm.nerdfonts.dev_python
+symbol = ' '
+style = 'yellow'
+format = 'via [$symbol$version]($style) '
+# Conda 已由上方模块显示环境名和 Python 版本，避免重复。
+detect_env_vars = ['VIRTUAL_ENV', '!CONDA_DEFAULT_ENV']
+
 [nodejs]
-symbol = 'node '
+# WezTerm wezterm.nerdfonts.dev_nodejs_small
+symbol = ' '
 style = 'green'
 format = 'via [$symbol$version]($style) '
 
 [rust]
-symbol = 'rs '
+# WezTerm wezterm.nerdfonts.dev_rust
+symbol = ' '
 style = 'peach'
 format = 'via [$symbol$version]($style) '
 
 [golang]
-symbol = 'go '
+# WezTerm wezterm.nerdfonts.dev_go
+symbol = ' '
 style = 'teal'
 format = 'via [$symbol$version]($style) '
 
-[docker_context]
-symbol = 'docker '
+[custom.docker_runtime]
+command = "docker version --format '{{.Client.Version}}'"
+when = 'command -v docker >/dev/null 2>&1'
+shell = ['sh']
 style = 'blue'
-format = 'via [$symbol$context]($style) '
+# WezTerm wezterm.nerdfonts.dev_docker
+format = 'via [ v$output]($style) '
+description = 'Docker client runtime'
 
 [cmd_duration]
 min_time = 2000

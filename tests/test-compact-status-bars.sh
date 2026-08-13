@@ -8,6 +8,7 @@ helper="$plugin_dir/status-carousel"
 wezterm_config="$repo_dir/wezterm/.config/wezterm/wezterm.lua"
 wezterm_colors="$repo_dir/wezterm/.config/wezterm/colors.lua"
 wezterm_mappings="$repo_dir/wezterm/.config/wezterm/mappings.lua"
+starship_config="$repo_dir/zsh/.config/starship.toml"
 tab_config="$repo_dir/wezterm/.config/wezterm/tab.lua"
 domain_status="$repo_dir/wezterm/.config/wezterm/domain-status.lua"
 tab_title_test="$repo_dir/tests/wezterm-tab-title.lua"
@@ -135,6 +136,20 @@ test "$(rg -Fc "CloseCurrentPane { confirm = false }" "$wezterm_mappings")" -eq 
 ! rg -Fq "CloseCurrentPane { confirm = true }" "$wezterm_mappings"
 rg -Fq "flags = 'LAUNCH_MENU_ITEMS'" "$wezterm_mappings"
 rg -Fq "flags = 'FUZZY|LAUNCH_MENU_ITEMS|DOMAINS'" "$wezterm_mappings"
+
+rg -Fq '$conda\' "$starship_config"
+rg -Fq '${custom.python_runtime}\' "$starship_config"
+rg -Fq '$python\' "$starship_config"
+rg -Fq '${custom.docker_runtime}\' "$starship_config"
+rg -Fq "format = 'via [󰌠 \(\$environment\)](bold green) '" "$starship_config"
+rg -Fq "format = '[v\$output](\$style) '" "$starship_config"
+rg -Fq "symbol = ' '" "$starship_config"
+rg -Fq "symbol = ' '" "$starship_config"
+rg -Fq "symbol = ' '" "$starship_config"
+rg -Fq "symbol = ' '" "$starship_config"
+rg -Fq "format = 'via [ v\$output](\$style) '" "$starship_config"
+rg -Fq "detect_env_vars = ['VIRTUAL_ENV', '!CONDA_DEFAULT_ENV']" "$starship_config"
+! rg -Fq '$docker_context\' "$starship_config"
 
 NYXNIRI_REPO_DIR="$repo_dir" \
   "$wezterm_test_bin" --config-file "$tab_title_test" show-keys >/dev/null
