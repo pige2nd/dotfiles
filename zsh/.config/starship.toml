@@ -12,8 +12,7 @@ $directory\
 $git_branch\
 $git_status\
 $fill\
-$conda\
-${custom.python_runtime}\
+($conda${custom.python_runtime} · )\
 $python\
 $nodejs\
 $rust\
@@ -72,55 +71,59 @@ symbol = ' '
 style = 'none'
 
 [conda]
-symbol = ' '
-format = '\[[$symbol\($environment\)](bold green)'
+symbol = ''
+format = '[$symbol ](green)[\($environment\)](bold green)'
 ignore_base = false
 
 [custom.python_runtime]
-command = "test -n \"$CONDA_DEFAULT_ENV\" && command -v python3 >/dev/null 2>&1 && python3 --version 2>&1 | awk '{print $2}'"
+command = "test -n \"$CONDA_DEFAULT_ENV\" && command -v python3 >/dev/null 2>&1 && python3 --version 2>&1 | awk '{print $2}' | cut -d. -f1,2"
 when = 'true'
 shell = ['sh']
-style = 'yellow'
-format = '([v$output]($style)\])'
+style = 'green'
+format = '( [$output]($style))'
 description = 'Active Python runtime'
 
 [python]
-# WezTerm wezterm.nerdfonts.dev_python
-symbol = ' '
+# WezTerm wezterm.nerdfonts.md_language_python
+symbol = ''
 style = 'yellow'
-format = '\[[$symbol$version]($style)\]'
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) · '
 
 [nodejs]
 # WezTerm wezterm.nerdfonts.dev_nodejs_small
-symbol = ' '
+symbol = ''
 style = 'green'
-format = '\[[$symbol$version]($style)\]'
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) · '
 
 [rust]
 # WezTerm wezterm.nerdfonts.dev_rust
-symbol = ' '
+symbol = ''
 style = 'peach'
-format = '\[[$symbol$version]($style)\]'
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) · '
 
 [golang]
 # WezTerm wezterm.nerdfonts.dev_go
-symbol = ' '
+symbol = ''
 style = 'teal'
-format = '\[[$symbol$version]($style)\]'
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) · '
 
 [custom.docker_runtime]
-command = "docker version --format '{{.Client.Version}}'"
+command = "docker version --format '{{.Client.Version}}' | cut -d. -f1,2"
 when = 'command -v docker >/dev/null 2>&1'
 shell = ['sh']
 style = 'blue'
-# WezTerm wezterm.nerdfonts.dev_docker
-format = '\[[ v$output]($style)\]'
+# WezTerm wezterm.nerdfonts.md_docker
+format = '[󰡨 $output]($style)'
 description = 'Docker client runtime'
 
 [cmd_duration]
 min_time = 2000
 style = 'yellow'
-format = 'took [$duration]($style) '
+format = ' took [$duration]($style) '
 
 [character]
 success_symbol = '[➜](bold green)'
