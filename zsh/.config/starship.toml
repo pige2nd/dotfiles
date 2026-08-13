@@ -81,7 +81,7 @@ command = "test -n \"$CONDA_DEFAULT_ENV\" && command -v python3 >/dev/null 2>&1 
 when = 'true'
 shell = ['sh']
 style = 'yellow'
-format = '( [v$output]($style)\])'
+format = '([v$output]($style)\])'
 description = 'Active Python runtime'
 
 [python]
