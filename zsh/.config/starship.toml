@@ -112,12 +112,12 @@ version_format = '${major}.${minor}'
 format = '[$symbol $version]($style) '
 
 [custom.docker_runtime]
-command = "docker --version | awk '{print $3}' | cut -d, -f1 | cut -d. -f1,2"
+command = "printf '󰡨'"
 when = 'command -v docker >/dev/null 2>&1 && { test -e Dockerfile || test -e docker-compose.yml || test -e docker-compose.yaml || test -e compose.yml || test -e compose.yaml; }'
 shell = ['sh']
 style = 'blue'
 # WezTerm wezterm.nerdfonts.md_docker
-format = '[󰡨 $output]($style)'
+format = '[$output]($style)'
 description = 'Docker client runtime'
 
 [cmd_duration]
