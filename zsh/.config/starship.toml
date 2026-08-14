@@ -12,12 +12,12 @@ $directory\
 $git_branch\
 $git_status\
 $fill\
-$conda\
-${custom.python_runtime}\
+($conda${custom.python_runtime})\
+$python\
 $nodejs\
 $rust\
 $golang\
-$docker_context\
+${custom.docker_runtime}\
 $cmd_duration\
 $line_break\
 $character"""
@@ -71,41 +71,59 @@ symbol = ' '
 style = 'none'
 
 [conda]
-format = 'via [󰌠 \($environment\)](bold green) '
+symbol = ''
+format = '[$symbol ](green)[\($environment\)](bold green)'
 ignore_base = false
 
 [custom.python_runtime]
-command = "python --version 2>&1 | awk '{print $2}'"
-when = 'test -n "$CONDA_DEFAULT_ENV" && command -v python >/dev/null 2>&1'
+command = "test -n \"$CONDA_DEFAULT_ENV\" && command -v python3 >/dev/null 2>&1 && python3 --version 2>&1 | awk '{print $2}' | cut -d. -f1,2"
+when = 'true'
 shell = ['sh']
-style = 'yellow'
-format = '[v$output]($style) '
+style = 'green'
+format = '( [$output]($style))'
 description = 'Active Python runtime'
 
+[python]
+# WezTerm wezterm.nerdfonts.md_language_python
+symbol = ''
+style = 'yellow'
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) '
+
 [nodejs]
-symbol = 'node '
+# WezTerm wezterm.nerdfonts.dev_nodejs_small
+symbol = ''
 style = 'green'
-format = 'via [$symbol$version]($style) '
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) '
 
 [rust]
-symbol = 'rs '
+# WezTerm wezterm.nerdfonts.dev_rust
+symbol = ''
 style = 'peach'
-format = 'via [$symbol$version]($style) '
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) '
 
 [golang]
-symbol = 'go '
+# WezTerm wezterm.nerdfonts.dev_go
+symbol = ''
 style = 'teal'
-format = 'via [$symbol$version]($style) '
+version_format = '${major}.${minor}'
+format = '[$symbol $version]($style) '
 
-[docker_context]
-symbol = 'docker '
+[custom.docker_runtime]
+command = "docker --version | awk '{print $3}' | cut -d, -f1 | cut -d. -f1,2"
+when = 'command -v docker >/dev/null 2>&1 && { test -e Dockerfile || test -e docker-compose.yml || test -e docker-compose.yaml || test -e compose.yml || test -e compose.yaml; }'
+shell = ['sh']
 style = 'blue'
-format = 'via [$symbol$context]($style) '
+# WezTerm wezterm.nerdfonts.md_docker
+format = '[󰡨 $output]($style)'
+description = 'Docker client runtime'
 
 [cmd_duration]
 min_time = 2000
 style = 'yellow'
-format = 'took [$duration]($style) '
+format = ' took [$duration]($style) '
 
 [character]
 success_symbol = '[➜](bold green)'
