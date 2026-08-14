@@ -149,8 +149,8 @@ config.skip_close_confirmation_for_processes_named = {}
 -- 滚动历史
 config.scrollback_lines = 10000
 
--- 隐藏滚动条
-config.enable_scroll_bar = false
+-- 显示滚动条
+config.enable_scroll_bar = true
 
 -- 输入时隐藏鼠标
 config.hide_mouse_cursor_when_typing = true
