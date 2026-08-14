@@ -112,13 +112,12 @@ version_format = '${major}.${minor}'
 format = '[$symbol $version]($style) '
 
 [custom.docker_runtime]
-command = "printf '󰡨'"
-when = 'command -v docker >/dev/null 2>&1 && { test -e Dockerfile || test -e docker-compose.yml || test -e docker-compose.yaml || test -e compose.yml || test -e compose.yaml; }'
+command = "printf '🐳'"
+when = 'command -v docker >/dev/null 2>&1 && { test -e compose.yml || test -e compose.yaml || test -e docker-compose.yml || test -e docker-compose.yaml || test -e Dockerfile; }'
 shell = ['sh']
 style = 'blue'
-# WezTerm wezterm.nerdfonts.md_docker
 format = '[$output]($style)'
-description = 'Docker client runtime'
+description = 'Docker project marker'
 
 [cmd_duration]
 min_time = 2000
