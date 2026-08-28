@@ -1,6 +1,6 @@
 # dotfiles
 
-用于在多台电脑之间同步终端配置，并复现 Linux 上的 Niri 桌面环境。
+用于在多台电脑之间同步核心终端配置，并复现 Linux 上的 Niri 桌面环境。
 跨平台边界是：WezTerm 支持 Windows、macOS 和 Linux；Niri/DMS/Noctalia
 及 `install.sh` 只面向 Ubuntu 26.04。
 
@@ -51,10 +51,12 @@ Noctalia 专属控件仍由现有 DMS 壁纸与控制中心功能承载。
 SSH 能从前台进程或 WezTerm domain 取得目标时，显示具体的用户、主机或 IP；
 文字左侧同时显示对应的系统、发行版或远程主机图标。
 
+## 独立配置
+
+Yazi 配置已拆到独立仓库：<https://github.com/pige2nd/yazi-config>。
+
 ## TODO
 
-- 添加 Yazi 的 `yazi.toml`、`keymap.toml` 和 `theme.toml`；配置目录与 opener
-  需要分别覆盖 Unix 和 Windows，完成前不纳入安装脚本。
 - 在真实 SSH 主机上验证右上角远程目标识别；目前只覆盖可重复运行的 argv 与
   WezTerm domain 映射测试。
 
