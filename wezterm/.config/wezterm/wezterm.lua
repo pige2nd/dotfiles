@@ -76,7 +76,7 @@ elseif is_macos then
   cjk_font = 'PingFang SC'
   emoji_font = 'Apple Color Emoji'
 end
-local symbol_font = 'Symbols Nerd Font Mono'
+local symbol_font = { family = 'JetBrainsMono Nerd Font' }
 
 local function font_with_fallback(primary)
   return wezterm.font_with_fallback {
@@ -140,17 +140,17 @@ config.window_padding = {
 -- 使用桌面环境自己的独立标题栏和窗口按钮。
 config.window_decorations = 'TITLE | RESIZE'
 
--- 点击系统关闭按钮时直接退出；pane/tab 快捷键仍各自要求确认。
+-- 点击系统关闭按钮时直接退出；pane/tab 是否确认由各自快捷键决定。
 config.window_close_confirmation = 'NeverPrompt'
 
--- 标签 / pane 关闭时也始终确认；默认情况下 bash、zsh、tmux 等进程会跳过确认。
+-- 需要确认的关闭动作不按进程名跳过确认。
 config.skip_close_confirmation_for_processes_named = {}
 
 -- 滚动历史
 config.scrollback_lines = 10000
 
--- 隐藏滚动条
-config.enable_scroll_bar = false
+-- Windows 显示可拖动滚动条
+config.enable_scroll_bar = is_windows
 
 -- 输入时隐藏鼠标
 config.hide_mouse_cursor_when_typing = true
@@ -182,8 +182,8 @@ config.selection_word_boundary =
 -- =========================================================
 
 require('colors').apply(config)
-require('mappings').apply(config)
 require('tab').apply(config)
+require('mappings').apply(config)
 require('command_palette').apply()
 -- require('plugins').apply(config)
 
