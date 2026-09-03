@@ -7,6 +7,7 @@
 - `wezterm`：跨平台 WezTerm 配置、等宽动态标签栏、快捷键和 Amber Manpage 配色
 - `zsh`：Zsh 环境、插件清单、别名、fzf、zoxide
 - `zsh/.config/starship.toml`：Starship 提示符配置
+- `tmux`：终端复用器配置，使用 `Alt-b` 作为前缀键，并通过 TPM 启用持续恢复
 - `niri`、`dms`：Niri 与 DMS 原生栏/桌面外壳
 - `niri/nyxniri`：从 NyxNiri 移植的动画、透明模糊、窗口规则与护眼模式
 - `vicinae`、`systemd`：主启动器及用户服务
@@ -30,6 +31,7 @@ cd ~/dotfiles
 ```
 
 `zsh` 首次启动时会按 `.zsh_plugins.txt` 自动安装 Antidote 插件；
+`tmux/install-plugins.sh` 会安装或更新 TPM、tmux-resurrect 与 tmux-continuum。
 WezTerm 首次加载时会自动获取 `wezterm-tabs` 插件。标签仍由 WezTerm 原生
 tab bar 承载，标签数增加时会均匀缩短；插件只负责标题格式化。
 

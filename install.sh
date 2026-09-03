@@ -8,7 +8,7 @@ if ! command -v stow >/dev/null 2>&1; then
   exit 1
 fi
 
-packages=(wezterm zsh niri niri-nyxniri noctalia session vicinae xresources systemd im rime applications)
+packages=(wezterm zsh tmux niri niri-nyxniri noctalia session vicinae xresources systemd im rime applications)
 
 cd "$repo_dir"
 # Earlier NyxNiri revisions deployed Noctalia hooks as ordinary files. Migrate
@@ -30,6 +30,8 @@ done
 # Never fold a whole runtime-capable directory into the repository. DMS,
 # Vicinae, Rime and desktop applications may create sibling files later.
 stow --no-folding --restow "${packages[@]}"
+
+"$repo_dir/tmux/install-plugins.sh"
 
 # The active NyxNiri effect is runtime state. Keep the switchable symlink out
 # of Git so eye-care toggles never write back into the Stow-managed repository.

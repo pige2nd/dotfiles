@@ -10,7 +10,6 @@ btop/
 gtk/
 npm/
 tiling-assistant/
-tmux/
 ulauncher/
 
 # 只跟踪输入法的静态配置，不跟踪 IBus 会话状态
