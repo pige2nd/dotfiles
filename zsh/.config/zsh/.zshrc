@@ -32,3 +32,8 @@ for _rc in ${ZDOTDIR:-$HOME}/.zshrc.d/*.zsh; do
   [[ $_rc:t == '~'* ]] || source "$_rc"
 done
 unset _rc
+
+. "$HOME/.local/share/../bin/env"
+
+export EDITOR=nvim
+export VISUAL=nvim

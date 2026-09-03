@@ -3,8 +3,8 @@
 # Catppuccin Mocha 风格：双行提示符，不额外插入空白行。
 palette = 'catppuccin_mocha'
 add_newline = false
-scan_timeout = 30
-command_timeout = 500
+scan_timeout = 1000
+command_timeout = 2000
 
 format = """
 $username\
@@ -35,8 +35,8 @@ overlay0 = '#6c7086'
 [directory]
 style = 'bold blue'
 format = 'in [$path]($style) '
-truncation_length = 3
-truncate_to_repo = true
+truncation_length = 0
+truncate_to_repo = false
 home_symbol = '~'
 read_only = ' ro'
 read_only_style = 'red'
@@ -71,7 +71,7 @@ symbol = ' '
 style = 'none'
 
 [conda]
-format = 'via [󰌠 \($environment\)](bold green) '
+format = '[󰌠](bold green) '
 ignore_base = false
 
 [custom.python_runtime]
@@ -79,28 +79,28 @@ command = "python --version 2>&1 | awk '{print $2}'"
 when = 'test -n "$CONDA_DEFAULT_ENV" && command -v python >/dev/null 2>&1'
 shell = ['sh']
 style = 'yellow'
-format = '[v$output]($style) '
+format = '[]($style) '
 description = 'Active Python runtime'
 
 [nodejs]
-symbol = 'node '
+symbol = ' '
 style = 'green'
-format = 'via [$symbol$version]($style) '
+format = '[$symbol]($style) '
 
 [rust]
-symbol = 'rs '
+symbol = ' '
 style = 'peach'
-format = 'via [$symbol$version]($style) '
+format = '[$symbol]($style) '
 
 [golang]
-symbol = 'go '
+symbol = ' '
 style = 'teal'
-format = 'via [$symbol$version]($style) '
+format = '[$symbol]($style) '
 
 [docker_context]
-symbol = 'docker '
+symbol = ' '
 style = 'blue'
-format = 'via [$symbol$context]($style) '
+format = '[$symbol]($style) '
 
 [cmd_duration]
 min_time = 2000
