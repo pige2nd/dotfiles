@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+set -eu
+
+if command -v pbpaste >/dev/null 2>&1; then
+  exec pbpaste
+fi
+
+if command -v win32yank.exe >/dev/null 2>&1; then
+  exec win32yank.exe -o --lf
+fi
+
+if command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -NoProfile -Command "[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new(); Get-Clipboard -Raw" | sed "s/\r$//"
+  exit 0
+fi
+
+if [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wl-paste >/dev/null 2>&1; then
+  exec wl-paste -n
+fi
+
+if command -v xclip >/dev/null 2>&1; then
+  exec xclip -selection clipboard -out
+fi
+
+if command -v xsel >/dev/null 2>&1; then
+  exec xsel --clipboard --output
+fi
+
+exit 1

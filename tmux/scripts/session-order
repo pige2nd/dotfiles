@@ -1,0 +1,148 @@
+#!/usr/bin/env sh
+set -eu
+
+option='@codex_session_order'
+tab="$(printf '\t')"
+
+live_sessions() {
+  tmux list-sessions -F "#{session_id}${tab}#{session_created}${tab}#{session_name}" | sort -k2,2n
+}
+
+ensure_order() {
+  saved="$(tmux show-option -gqv "$option" 2>/dev/null || true)"
+  live_ids="$(live_sessions | cut -f1)"
+  order=''
+
+  for id in $saved; do
+    if printf '%s\n' "$live_ids" | grep -Fxq "$id"; then
+      order="${order}${order:+ }${id}"
+    fi
+  done
+
+  for id in $live_ids; do
+    case " $order " in
+      *" $id "*) ;;
+      *) order="${order}${order:+ }${id}" ;;
+    esac
+  done
+
+  tmux set-option -gq "$option" "$order"
+  printf '%s\n' $order
+}
+
+name_for_id() {
+  wanted="$1"
+  tmux list-sessions -F "#{session_id}${tab}#{session_name}" |
+    awk -F '\t' -v wanted="$wanted" '$1 == wanted { print $2; exit }'
+}
+
+target_for_index() {
+  index="$1"
+  ensure_order | sed -n "${index}p"
+}
+
+current_id() {
+  tmux display-message -p '#{session_id}'
+}
+
+switch_to_id() {
+  target="$1"
+  [ -n "$target" ] || exit 0
+  tmux switch-client -t "$target"
+  tmux refresh-client -S
+}
+
+switch_relative() {
+  direction="$1"
+  current="$(current_id)"
+  order="$(ensure_order | tr '\n' ' ')"
+  count="$(printf '%s\n' $order | sed '/^$/d' | wc -l)"
+  [ "$count" -gt 0 ] || exit 0
+
+  position=1
+  for id in $order; do
+    [ "$id" = "$current" ] && break
+    position=$((position + 1))
+  done
+
+  case "$direction" in
+    next)
+      target_position=$((position + 1))
+      [ "$target_position" -gt "$count" ] && target_position=1
+      ;;
+    prev)
+      target_position=$((position - 1))
+      [ "$target_position" -lt 1 ] && target_position="$count"
+      ;;
+    *) exit 1 ;;
+  esac
+
+  switch_to_id "$(printf '%s\n' $order | sed -n "${target_position}p")"
+}
+
+move_current() {
+  direction="$1"
+  current="$(current_id)"
+  order="$(ensure_order | tr '\n' ' ')"
+
+  set -- $order
+  count="$#"
+  [ "$count" -gt 1 ] || exit 0
+
+  position=1
+  for id in "$@"; do
+    [ "$id" = "$current" ] && break
+    position=$((position + 1))
+  done
+
+  case "$direction" in
+    left)
+      [ "$position" -le 1 ] && exit 0
+      target_position=$((position - 1))
+      ;;
+    right)
+      [ "$position" -ge "$count" ] && exit 0
+      target_position=$((position + 1))
+      ;;
+    *) exit 1 ;;
+  esac
+
+  new_order=''
+  i=1
+  current_id=''
+  target_id=''
+  for id in "$@"; do
+    [ "$i" -eq "$position" ] && current_id="$id"
+    [ "$i" -eq "$target_position" ] && target_id="$id"
+    i=$((i + 1))
+  done
+
+  i=1
+  for id in "$@"; do
+    if [ "$i" -eq "$position" ]; then
+      out="$target_id"
+    elif [ "$i" -eq "$target_position" ]; then
+      out="$current_id"
+    else
+      out="$id"
+    fi
+    new_order="${new_order}${new_order:+ }${out}"
+    i=$((i + 1))
+  done
+
+  tmux set-option -gq "$option" "$new_order"
+  "$(dirname -- "$0")/status-left"
+  tmux refresh-client -S
+}
+
+case "${1:-list}" in
+  list) ensure_order ;;
+  target) target_for_index "${2:?missing index}" ;;
+  name) name_for_id "${2:?missing session id}" ;;
+  switch) switch_to_id "$(target_for_index "${2:?missing index}")" ;;
+  next) switch_relative next ;;
+  prev) switch_relative prev ;;
+  move-left) move_current left ;;
+  move-right) move_current right ;;
+  *) exit 1 ;;
+esac
