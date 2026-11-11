@@ -11,8 +11,8 @@ escape_tmux_format() {
 }
 
 # Keep window selection in native formats so redraws never wait for a shell job.
-window_format='#[bg=colour238]#[nobold] #[fg=colour249]#{window_index}:#[fg=colour252]#{window_name} '
-current_window_format='#[bg=colour238]#[fg=colour114]#[bg=colour114]#[fg=colour232]#[bold]#{window_index}:#{window_name}#[bg=colour238]#[fg=colour114]#[nobold]'
+window_format='#[range=user|w#{window_id}]#[bg=colour238]#[nobold] #[fg=colour249]#{window_index}:#[fg=colour252]#{window_name}#{@tracker_badge} #[norange]'
+current_window_format='#[range=user|w#{window_id}]#[bg=colour238]#[fg=colour114]#[bg=colour114]#[fg=colour232]#[bold]#{window_index}:#{window_name}#{@tracker_badge}#[range=user|x#{window_id}] × #[norange]#[bg=colour238]#[fg=colour114]#[nobold]'
 
 for current_session_id in $order; do
   status=''
@@ -20,13 +20,14 @@ for current_session_id in $order; do
   for session_id in $order; do
     session_number=$((session_number + 1))
     if [ "$session_id" = "$current_session_id" ]; then
-      status="${status}"'#[fg=colour238]#[bg=colour238]#[fg=colour255]#[bold] #{session_name} #[nobold]#[fg=colour245]| '
-      status="${status}#{W:${window_format},${current_window_format}}"'#[bg=colour238] #[bg=default]#[fg=colour238]#[default] '
+      status="${status}"'#[range=user|s#{session_id}]#[fg=colour238]#[bg=colour238]#[fg=colour255]#[bold] #{session_name}#[range=user|c#{session_id}] × #[norange]#[nobold]#[fg=colour245]| '
+      status="${status}#{W:${window_format},${current_window_format}}"'#[range=user|a#{session_id}]#[bg=colour238]#[fg=colour220] + #[norange]#[bg=default]#[fg=colour238]#[default] '
     else
       session_name="$(printf '%s\n' "$sessions" | awk -F '\t' -v id="$session_id" '$1 == id { print $2; exit }')"
       display_session="$(escape_tmux_format "$session_name")"
-      status="${status}#[nobold]#[fg=colour250]${session_number}.#[fg=colour81]${display_session}#[default] "
+      status="${status}#[range=user|s${session_id}]#[nobold]#[fg=colour250]${session_number}.#[fg=colour81]${display_session}#[norange]#[default] "
     fi
   done
+  status="${status}"'#[range=user|ns]#[fg=colour81] + #[norange]#[default]'
   tmux set-option -q -t "$current_session_id" @codex_status_left "$status"
 done

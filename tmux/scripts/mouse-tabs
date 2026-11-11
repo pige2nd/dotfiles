@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Mouse actions for the existing grouped tmux status line."""
+import shlex
+import subprocess
+import sys
+from pathlib import Path
+
+
+def tmux(*args):
+    return subprocess.check_output(["tmux", *args], text=True).strip()
+
+
+def command(*args):
+    return shlex.join(args)
+
+
+action, client, target, *extra = sys.argv[1:]
+
+
+def callback(action, target, *args):
+    shell = command(str(Path(__file__).resolve()), action, client, target, *args)
+    return command("run-shell", "-b", shell)
+
+
+def focus(window):
+    tmux("switch-client", "-c", client, "-t", window)
+    tmux("select-window", "-t", window)
+
+
+def new_window(session):
+    path = tmux("display-message", "-p", "-t", session, "#{pane_current_path}")
+    window = tmux("new-window", "-d", "-P", "-F", "#{window_id}",
+                  "-t", session + ":", "-c", path)
+    focus(window)
+
+
+def new_session():
+    path = tmux("display-message", "-p", "-c", client, "#{pane_current_path}")
+    session = tmux("new-session", "-d", "-P", "-F", "#{session_id}", "-c", path)
+    tmux("switch-client", "-c", client, "-t", session)
+
+
+def move(window, session):
+    tmux("move-window", "-d", "-s", window, "-t", session + ":")
+    focus(window)
+
+
+def menu(title, items):
+    args = ["display-menu", "-MO", "-c", client, "-x", "M", "-y", "S", "-T", title]
+    for item in items:
+        args.extend(item if item else [""])
+    # Dismissing a menu is a normal nonzero exit from tmux.
+    subprocess.run(["tmux", *args])
+
+
+if action == "press":
+    pid = tmux("display-message", "-p", "-c", client, "#{client_pid}")
+    tmux("set-option", "-g", "@codex_mouse_" + pid, target)
+elif action == "click":
+    if target.startswith("s$"):
+        tmux("switch-client", "-c", client, "-t", target[1:])
+    elif target.startswith("w@"):
+        focus(target[1:])
+    elif target.startswith("x@"):
+        menu("Close this window?", [
+            ("Close window", "y", command("kill-window", "-t", target[1:])),
+            ("Cancel", "n", ""),
+        ])
+    elif target.startswith("a$"):
+        new_window(target[1:])
+    elif target == "ns":
+        new_session()
+    elif target.startswith("c$"):
+        menu("Close this session?", [
+            ("Close session and its windows", "y", callback("close-session", target[1:])),
+            ("Cancel", "n", ""),
+        ])
+elif action == "new-window":
+    new_window(target)
+elif action == "new-session":
+    new_session()
+elif action == "close-session":
+    current = tmux("display-message", "-p", "-c", client, "#{session_id}")
+    others = [sid for sid in tmux("list-sessions", "-F", "#{session_id}").splitlines()
+              if sid != target]
+    if current == target and others:
+        tmux("switch-client", "-c", client, "-t", others[0])
+    tmux("kill-session", "-t", target)
+elif action == "move":
+    move(target, extra[0])
+elif action == "move-new":
+    # Replace only the temporary idle window created for this new session.
+    placeholder = tmux("new-session", "-d", "-P", "-F",
+                       "#{session_id}:#{window_index}", "exec sleep 86400")
+    tmux("move-window", "-k", "-s", target, "-t", placeholder)
+    focus(target)
+elif action == "drop":
+    pid = tmux("display-message", "-p", "-c", client, "#{client_pid}")
+    source = tmux("show-options", "-gqv", "@codex_mouse_" + pid)
+    tmux("set-option", "-gu", "@codex_mouse_" + pid)
+    if source.startswith("w@") and target.startswith("s$"):
+        current = tmux("display-message", "-p", "-t", source[1:], "#{session_id}")
+        if current != target[1:]:
+            move(source[1:], target[1:])
+    elif source.startswith("w@") and target.startswith(("w@", "x@")):
+        if source[1:] != target[1:]:
+            tmux("swap-window", "-d", "-s", source[1:], "-t", target[1:])
+            focus(source[1:])
+elif action == "move-menu":
+    sessions = tmux("list-sessions", "-F", "#{session_id}\t#{session_name}")
+    current = tmux("display-message", "-p", "-t", target, "#{session_id}")
+    items = []
+    for line in sessions.splitlines():
+        sid, name = line.split("\t", 1)
+        if sid != current:
+            # Menu labels are formats; keep literal names literal.
+            items.append(("Move to " + name.replace("#", "##"), "",
+                          callback("move", target, sid)))
+    items.extend([None, ("Move to new session", "n", callback("move-new", target))])
+    menu("Move window", items)
+elif action == "menu":
+    if target.startswith(("w@", "x@")):
+        window = target[1:]
+        session = tmux("display-message", "-p", "-t", window, "#{session_id}")
+        menu("Window", [
+            ("New window", "w", callback("new-window", session)),
+            ("Rename window", "r", command("command-prompt", "-t", client,
+             "-I", tmux("display-message", "-p", "-t", window, "#{window_name}"),
+             command("rename-window", "-t", window) + ' "%%"')),
+            ("Move to session...", "m", callback("move-menu", window)),
+            None,
+            ("Close window...", "x", callback("click", "x" + window)),
+        ])
+    else:
+        session = target[1:] if target.startswith(("s$", "a$", "c$")) else tmux(
+            "display-message", "-p", "-c", client, "#{session_id}")
+        menu("Session", [
+            ("New window", "w", callback("new-window", session)),
+            ("New session", "s", callback("new-session", session)),
+            ("Rename session", "r", command("command-prompt", "-t", client,
+             "-I", tmux("display-message", "-p", "-t", session, "#{session_name}"),
+             command("rename-session", "-t", session) + ' "%%"')),
+            None,
+            ("Close session...", "x", callback("click", "c" + session)),
+        ])
