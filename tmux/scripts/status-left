@@ -12,7 +12,7 @@ escape_tmux_format() {
 
 # Keep window selection in native formats so redraws never wait for a shell job.
 window_format='#[range=user|w#{window_id}]#[bg=colour238]#[nobold] #[fg=colour249]#{window_index}:#[fg=colour252]#{window_name}#{@tracker_badge} #[norange]'
-current_window_format='#[range=user|w#{window_id}]#[bg=colour238]#[fg=colour114]#[bg=colour114]#[fg=colour232]#[bold]#{window_index}:#{window_name}#{@tracker_badge}#[range=user|x#{window_id}] × #[norange]#[bg=colour238]#[fg=colour114]#[nobold]'
+current_window_format='#[range=user|w#{window_id}]#[bg=colour238]#[fg=colour114]#[bg=colour114]#[fg=colour232]#[bold]#{window_index}:#{window_name}#{@tracker_badge}#[range=user|x#{window_id}] ×#[norange]#[bg=colour238]#[fg=colour114]#[nobold]'
 
 for current_session_id in $order; do
   status=''

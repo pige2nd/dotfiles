@@ -1,0 +1,79 @@
+# Windows + WSL Alacritty config converted from your WezTerm setup.
+# Default shell: WSL Debian home directory.
+# Put this at: %APPDATA%\alacritty\alacritty.toml
+
+[general]
+import = ["~/AppData/Roaming/alacritty/themes/warm.toml"]
+live_config_reload = true
+
+[env]
+TERM = "xterm-256color"
+
+[terminal]
+shell = { program = "wsl.exe", args = ["-d", "Debian", "--cd", "~"] }
+
+[window]
+dimensions = { columns = 120, lines = 34 }
+padding = { x = 10, y = 8 }
+decorations = "Full"
+opacity = 1.0
+startup_mode = "Windowed"
+dynamic_title = true
+
+[scrolling]
+history = 10000
+multiplier = 2
+
+[font]
+size = 14.0
+normal = { family = "Maple Mono NF CN", style = "Regular" }
+bold = { family = "Maple Mono NF CN", style = "Bold" }
+italic = { family = "Maple Mono NF CN", style = "Italic" }
+bold_italic = { family = "Maple Mono NF CN", style = "Bold Italic" }
+offset = { x = 0, y = 0 }
+
+[cursor]
+style = { shape = "Beam", blinking = "On" }
+blink_interval = 600
+
+[selection]
+semantic_escape_chars = " \t\n{}[]()\\\"'`,;:@|"
+save_to_clipboard = false
+
+[mouse]
+hide_when_typing = true
+bindings = [
+  { mouse = "Right", action = "Paste" },
+]
+
+[hints]
+enabled = [
+  { regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\\u0000-\\u001F\\u007F-\\u009F<>\"\\s{-}\\^`]+", hyperlinks = true, command = { program = "cmd", args = ["/c", "start", ""] }, post_processing = true, persist = false, mouse = { enabled = true, mods = "Control" }, binding = { key = "U", mods = "Control|Shift" } },
+]
+
+[keyboard]
+bindings = [
+  # Clipboard
+  { key = "C", mods = "Control|Shift", action = "Copy" },
+  { key = "V", mods = "Control|Shift", action = "Paste" },
+
+  # Search and vi/copy mode
+  { key = "F", mods = "Control|Shift", action = "SearchForward" },
+  { key = "B", mods = "Control|Shift", action = "SearchBackward" },
+  { key = "Space", mods = "Control|Shift", mode = "~Search", action = "ToggleViMode" },
+
+  # Font size
+  { key = "=", mods = "Control", action = "IncreaseFontSize" },
+  { key = "-", mods = "Control", action = "DecreaseFontSize" },
+  { key = "0", mods = "Control", action = "ResetFontSize" },
+
+  # Window
+  { key = "T", mods = "Control|Shift", action = "CreateNewWindow" },
+  { key = "N", mods = "Control|Shift", action = "SpawnNewInstance" },
+
+  # Scrollback
+  { key = "PageUp", mods = "Shift", action = "ScrollPageUp" },
+  { key = "PageDown", mods = "Shift", action = "ScrollPageDown" },
+  { key = "Home", mods = "Shift", action = "ScrollToTop" },
+  { key = "End", mods = "Shift", action = "ScrollToBottom" },
+]
