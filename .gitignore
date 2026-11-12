@@ -1,32 +1,7 @@
-# 本机运行时状态 / 自动生成文件
-wezterm/.config/wezterm/wezterm_toggle
 zsh/.config/zsh/.zcompdump*
-
-# 当前不纳入此仓库同步的其他 Stow 包
-albert/
-autostart/
-bat/
-btop/
-gtk/
-npm/
-tiling-assistant/
-ulauncher/
-
-# 只跟踪输入法的静态配置，不跟踪 IBus 会话状态
-im/.config/ibus/
-im/.config/fcitx5/conf/cached_layouts
-
-# docs 中原有的本机笔记仍不纳入，只开放架构与迁移文档
-docs/*
-!docs/ARCHITECTURE.md
-!docs/MIGRATION.md
-
-# 常见系统与编辑器文件
 .DS_Store
 *.swp
 *~
-
-# 不应进入公开仓库的本地配置与密钥
 .env
 .env.*
 *.pem

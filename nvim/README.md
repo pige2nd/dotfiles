@@ -17,7 +17,7 @@
 
 依赖：Neovim 0.10 或 0.11、Git、GNU Stow、fzf > 0.36、ripgrep、fd/fdfind、curl、tar、C/C++ 编译器、Nerd Font。WSL 剪贴板复用本仓库的 `tmux/scripts/clipboard-copy` 与 `clipboard-paste`。
 
-仓库应克隆到 `~/dotfiles`。本模块独立启用，不需要运行面向 Linux 桌面的根目录 `install.sh`。
+仓库应克隆到 `~/dotfiles`。可通过根目录 `install.sh` 一起部署配置，也可按下文单独启用；插件仍需按下文安装。
 
 先安装四个插件（已经存在的目录可跳过）：
 

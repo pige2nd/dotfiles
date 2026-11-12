@@ -1,4 +1,0 @@
-# Reinstall these from the Vicinae store after first launch.
-store.vicinae.fuzzy-files
-store.vicinae.niri
-store.vicinae.process-manager

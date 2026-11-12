@@ -1,83 +1,47 @@
 # dotfiles
 
-用于在多台电脑之间同步核心终端配置，并复现 Linux 上的 Niri 桌面环境。
-跨平台边界是：WezTerm 支持 Windows、macOS 和 Linux；Niri/DMS/Noctalia
-及 `install.sh` 只面向 Ubuntu 26.04。
+集中维护终端内的工具配置：Zsh、Starship、tmux、Yazi 和 Neovim。终端模拟器与 Linux 桌面环境独立维护。
 
-- `wezterm`：跨平台 WezTerm 配置、等宽动态标签栏、快捷键和 Amber Manpage 配色
-- `zsh`：Zsh 环境、插件清单、别名、fzf、zoxide
-- `zsh/.config/starship.toml`：Starship 提示符配置
-- `tmux`：终端复用器配置，使用 `Alt-b` 作为前缀键，并通过 TPM 启用持续恢复
-- `nvim`：Neovim 配置、IJKL 导航、Tree-sitter 高亮与项目搜索；恢复步骤见 [nvim/README.md](nvim/README.md)
-- `niri`、`dms`：Niri 与 DMS 原生栏/桌面外壳
-- `niri/nyxniri`：从 NyxNiri 移植的动画、透明模糊、窗口规则与护眼模式
-- `vicinae`、`systemd`：主启动器及用户服务
-- `applications`：WeChat 的可移植 XWayland desktop 覆盖
-- `im`、`rime`、`xresources`：Fcitx5/Rime 与 XWayland 输入缩放边界
+| 目录 | 内容 |
+|---|---|
+| `zsh` | Zsh 环境、Antidote 插件、fzf、zoxide、Starship |
+| `tmux` | tmux 配置、剪贴板与会话脚本、TPM 插件安装入口 |
+| `yazi` | Yazi 配置、主题、插件和 Office 预览脚本，详见 [说明](yazi/README.md) |
+| `nvim` | Neovim 配置，依赖与插件安装见 [说明](nvim/README.md) |
 
-架构边界见 `docs/ARCHITECTURE.md`，新机步骤见 `docs/MIGRATION.md`。
+## 安装
 
-## 在新电脑上使用
+面向 Linux/WSL 和 macOS 的工具配置；Yazi 沿用原有 macOS 配置，未新增 Linux/WSL 集成。按各模块说明安装软件与依赖，先备份并移开冲突配置，再执行：
 
-### Ubuntu 26.04
-
-Ubuntu 26.04 新机先按 `manifests/apt-packages.txt` 和迁移文档安装所需软件，
-克隆仓库，然后执行：
-
-```bash
-git clone <这个仓库的地址> ~/dotfiles
+```sh
+git clone https://github.com/pige2nd/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh
-./tests/verify-desktop.sh
+./tmux/install-plugins.sh
 ```
 
-`zsh` 首次启动时会按 `.zsh_plugins.txt` 自动安装 Antidote 插件；
-`tmux/install-plugins.sh` 会安装或更新 TPM、tmux-resurrect 与 tmux-continuum。
-WezTerm 首次加载时会自动获取 `wezterm-tabs` 插件。标签仍由 WezTerm 原生
-tab bar 承载，标签数增加时会均匀缩短；插件只负责标题格式化。
+需要 GNU Stow。仓库放在 `~/dotfiles`：现有 tmux 与 Neovim 的辅助脚本引用该位置。安装入口只部署配置，不安装软件、不改桌面服务；Stow 遇到冲突会停止。Zsh 首次启动会自动获取 Antidote 插件；Neovim 插件按模块说明手动安装。
 
-登录 Niri 后可按 `Super+Ctrl+N` 切换护眼模式。它会联动 DMS 夜间色温，
-并在“不透明、无模糊”和默认视觉效果之间切换；`Super+N` 仍是 DMS 通知中心。
-顶部 Bar 将 NyxNiri V2 的左/中/右格局映射为 DMS 原生组件，并使用透明胶囊样式；
-Noctalia 专属控件仍由现有 DMS 壁纸与控制中心功能承载。
+只启用部分工具时，可运行 `stow --no-folding --target="$HOME" zsh tmux`。Starship 跟随 `zsh` 包部署。
 
-如果目标路径已有同名文件，Stow 会停止并提示冲突。确认备份后再处理，
-不要直接覆盖未知配置。
-
-### Windows 与 macOS
-
-两端只复用 `wezterm/.config/wezterm`，不运行 Linux 桌面安装脚本。Windows
-默认打开 CMD，并在 Launcher 中提供 PowerShell 与 WSL；macOS 默认打开
-`/bin/zsh`。Windows 与 macOS 的中文 fallback 统一使用 PingFang SC；Emoji
-仍使用各自的系统字体。SF Mono 与 Windows 上的 PingFang SC 需要自行安装。
-右上角状态跟随当前 pane：CMD/PowerShell 显示 `WINDOWS`，WSL 显示具体发行版；
-SSH 能从前台进程或 WezTerm domain 取得目标时，显示具体的用户、主机或 IP；
-文字左侧同时显示对应的系统、发行版或远程主机图标。
-
-## 独立配置
-
-Yazi 配置已拆到独立仓库：<https://github.com/pige2nd/yazi-config>。
-
-## TODO
-
-- 在真实 SSH 主机上验证右上角远程目标识别；目前只覆盖可重复运行的 argv 与
-  WezTerm domain 映射测试。
+原来把 yazi-config 克隆到 `~/.config/yazi` 的用户，先将该目录备份并移开，再部署本仓库的 `yazi` 包。原插件、主题和第三方许可证一并保留。
 
 ## 日常同步
 
-```bash
+```sh
 cd ~/dotfiles
 git pull --rebase
 ./install.sh
 ```
 
-修改配置后提交并推送：
+修改配置后检查 `git diff` 再提交。运行状态、缓存、令牌和私钥不纳入同步。
 
-```bash
-git add -A
-git commit -m "Update dotfiles"
-git push
-```
+## 独立仓库
 
-本仓库不保存 `.zcompdump`、`wezterm_toggle` 等本机运行时文件，也不应
-保存令牌、密码或私钥。
+- [wezterm-config](https://github.com/pige2nd/wezterm-config)：WezTerm 配置、配色与测试。
+- [alacritty-config](https://github.com/pige2nd/alacritty-config)：Windows Alacritty 配置与主题。
+- [linux-desktop](https://github.com/pige2nd/linux-desktop)：Niri、DMS、Noctalia、输入法与桌面部署。
+
+原有桌面与终端模拟器文件已迁往上述仓库，历史版本仍可从 Git 历史查看。Yazi 从 [yazi-config@14252c7](https://github.com/pige2nd/yazi-config/tree/14252c7a44997b2f0b65b57945debcd5fe88566b) 合入。
+
+已有机器切换前，按新仓库迁移说明重新连接旧 Stow 链接；不要在仍有运行中桌面会话依赖旧目录时直接删除旧配置目录。

@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=NyxNiri
-Comment=Niri with Noctalia V5 (DMS remains available in the regular Niri session)
-Exec=/usr/local/bin/niri-nyxniri-session
-TryExec=/usr/local/bin/niri-nyxniri-session
-Type=Application
-DesktopNames=niri;NyxNiri;
