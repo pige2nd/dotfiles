@@ -1,0 +1,12 @@
+[Unit]
+Description=Agent Tracker tmux status updates
+Requires=agent-tracker.service
+After=agent-tracker.service
+
+[Service]
+ExecStart=/usr/bin/python3 %h/dotfiles/agent-tracker/bridge.py listen
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

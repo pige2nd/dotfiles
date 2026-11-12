@@ -8,6 +8,7 @@
 | `tmux` | tmux 配置、剪贴板与会话脚本、TPM 插件安装入口 |
 | `yazi` | Yazi 配置、主题、插件和 Office 预览脚本，详见 [说明](yazi/README.md) |
 | `nvim` | Neovim 配置，依赖与插件安装见 [说明](nvim/README.md) |
+| `agent-tracker` | 可选的 Codex CLI / Pi CLI 任务追踪与 tmux 集成，见 [说明](agent-tracker/README.md) |
 
 ## 安装
 
@@ -25,6 +26,12 @@ cd ~/dotfiles
 只启用部分工具时，可运行 `stow --no-folding --target="$HOME" zsh tmux`。Starship 跟随 `zsh` 包部署。
 
 原来把 yazi-config 克隆到 `~/.config/yazi` 的用户，先将该目录备份并移开，再部署本仓库的 `yazi` 包。原插件、主题和第三方许可证一并保留。
+
+## 可选任务追踪
+
+Linux/WSL 的 tmux 用户可按 [agent-tracker 安装说明](agent-tracker/README.md) 启用 Codex CLI / Pi CLI 任务追踪。`Alt-b` 后按 `a` 打开任务列表，`Alt-m` 跳转最新未读结果；状态栏显示运行与未读标记。
+
+该模块通过独立的构建、服务和 hooks 安装步骤启用，不属于 GNU Stow 包，根目录 `install.sh` 不安装或启用它。上游源码、二进制和运行数据留在用户目录。
 
 ## 日常同步
 

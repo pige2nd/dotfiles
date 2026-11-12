@@ -1,0 +1,9 @@
+{
+  "description": "Report Codex CLI task lifecycle to the local tmux agent tracker.",
+  "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "python3 \"$HOME/dotfiles/agent-tracker/bridge.py\" codex", "timeout": 3}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "python3 \"$HOME/dotfiles/agent-tracker/bridge.py\" codex", "timeout": 3}]}],
+    "Interrupt": [{"hooks": [{"type": "command", "command": "python3 \"$HOME/dotfiles/agent-tracker/bridge.py\" codex", "timeout": 3}]}],
+    "SessionEnd": [{"hooks": [{"type": "command", "command": "python3 \"$HOME/dotfiles/agent-tracker/bridge.py\" codex", "timeout": 3}]}]
+  }
+}
