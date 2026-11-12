@@ -8,6 +8,7 @@
 - `zsh`：Zsh 环境、插件清单、别名、fzf、zoxide
 - `zsh/.config/starship.toml`：Starship 提示符配置
 - `tmux`：终端复用器配置，使用 `Alt-b` 作为前缀键，并通过 TPM 启用持续恢复
+- `nvim`：Neovim 配置、IJKL 导航、Tree-sitter 高亮与项目搜索；恢复步骤见 [nvim/README.md](nvim/README.md)
 - `niri`、`dms`：Niri 与 DMS 原生栏/桌面外壳
 - `niri/nyxniri`：从 NyxNiri 移植的动画、透明模糊、窗口规则与护眼模式
 - `vicinae`、`systemd`：主启动器及用户服务
