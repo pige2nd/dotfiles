@@ -37,3 +37,6 @@ unset _rc
 
 export EDITOR=nvim
 export VISUAL=nvim
+
+# Use emacs-style command-line editing.
+bindkey -e
