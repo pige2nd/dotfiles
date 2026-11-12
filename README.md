@@ -27,6 +27,19 @@ cd ~/dotfiles
 
 原来把 yazi-config 克隆到 `~/.config/yazi` 的用户，先将该目录备份并移开，再部署本仓库的 `yazi` 包。原插件、主题和第三方许可证一并保留。
 
+## tmux 三窗格布局
+
+窗口恰好有两个 pane 时，先按前缀 `Alt+b`，松开后再按下列组合键：
+
+| 按键 | 新 pane 的位置 |
+|---|---|
+| `Alt+i` | 上方，横跨整个窗口宽度 |
+| `Alt+k` | 下方，横跨整个窗口宽度 |
+| `Alt+j` | 左侧，横跨整个窗口高度 |
+| `Alt+l` | 右侧，横跨整个窗口高度 |
+
+原有两个 pane 会重新均分，原先手动调整的比例会重置；新 pane 继承目标 pane 的目录。只有一个或已有三个及以上 pane 时，不改变布局。直接按 `Alt+i/j/k/l` 仍用于切换 pane。
+
 ## 可选任务追踪
 
 Linux/WSL 的 tmux 用户可按 [agent-tracker 安装说明](agent-tracker/README.md) 启用 Codex CLI / Pi CLI 任务追踪。`Alt-b` 后按 `a` 打开任务列表，`Alt-m` 跳转最新未读结果；状态栏显示运行与未读标记。

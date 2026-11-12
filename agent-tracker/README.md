@@ -76,12 +76,3 @@ journalctl --user -u agent-tracker-tmux.service -n 30
 
 禁用时移除本集成的 Codex hooks / Pi 扩展，停止上述两个服务，
 并移除 tmux 中标为 Agent task results 的绑定和 hooks。
-
-
-## 回归验证
-
-```sh
-python3 tests/test-agent-tracker.py
-```
-
-测试使用独立 tmux socket 和临时 tracker socket，检查 CLI 事件上报、pane 上下文、状态标记及 tmux 配置解析，不连接正在运行的 tracker 服务。
