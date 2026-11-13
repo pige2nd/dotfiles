@@ -128,3 +128,73 @@ desc = "Tag selected files"
 on = [ "b", "r" ]
 run = "plugin mactag remove"
 desc = "Untag selected files"
+
+# --- pref-by-location start ---
+[[mgr.prepend_keymap]]
+on = "."
+run = ["hidden toggle", "plugin pref-by-location -- save"]
+desc = "Toggle hidden files and save this directory preference"
+
+[[mgr.prepend_keymap]]
+on = ["m", "s"]
+run = ["linemode size", "plugin pref-by-location -- save"]
+desc = "Line mode: size (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = ["m", "P"]
+run = ["linemode permissions", "plugin pref-by-location -- save"]
+desc = "Line mode: permissions (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = ["m", "b"]
+run = ["linemode btime", "plugin pref-by-location -- save"]
+desc = "Line mode: birth time (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = ["m", "m"]
+run = ["linemode mtime", "plugin pref-by-location -- save"]
+desc = "Line mode: modified time (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = ["m", "o"]
+run = ["linemode owner", "plugin pref-by-location -- save"]
+desc = "Line mode: owner (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = ["m", "n"]
+run = ["linemode none", "plugin pref-by-location -- save"]
+desc = "Line mode: none (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = [",", "t"]
+run = "plugin pref-by-location -- toggle"
+desc = "Toggle automatic directory preferences"
+
+[[mgr.prepend_keymap]]
+on = [",", "R"]
+run = "plugin pref-by-location -- reset"
+desc = "Reset preferences for the current directory"
+
+[[mgr.prepend_keymap]]
+on = [",", "m"]
+run = ["sort mtime --reverse=no", "linemode mtime", "plugin pref-by-location -- save"]
+desc = "Sort by modified time (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = [",", "M"]
+run = ["sort mtime --reverse", "linemode mtime", "plugin pref-by-location -- save"]
+desc = "Sort by modified time, reverse (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = [",", "b"]
+run = ["sort btime --reverse=no", "linemode btime", "plugin pref-by-location -- save"]
+desc = "Sort by birth time (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = [",", "B"]
+run = ["sort btime --reverse", "linemode btime", "plugin pref-by-location -- save"]
+desc = "Sort by birth time, reverse (save for this directory)"
+
+[[mgr.prepend_keymap]]
+on = [",", "e"]
+run = ["sort extension --reverse=no", "plugin pref-by-location -- save"]

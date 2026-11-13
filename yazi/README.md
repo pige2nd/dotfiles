@@ -37,3 +37,19 @@ stow --no-folding --target="$HOME" yazi
 ## Notes
 
 This repo intentionally avoids Linux/WSL-specific integrations such as `wl-clipboard`, `gvfs`, and Windows opener rules.
+
+## 按目录记忆偏好
+
+`pref-by-location` 保存并恢复各目录的排序、隐藏文件显示和行信息模式。当前沿用 WSL 已使用的插件，支持范围为 Yazi 26.5.6 至 26.9.1，上游已停止维护；来源与许可证见插件目录。
+
+| 按键 | 操作 |
+|---|---|
+| `.` | 切换隐藏文件并保存 |
+| `m s/P/b/m/o/n` | 显示大小/权限/创建时间/修改时间/所有者/无信息，并保存 |
+| `, m/M` | 按修改时间正序/倒序排列，并保存 |
+| `, b/B` | 按创建时间正序/倒序排列，并保存 |
+| `, e` | 按扩展名排序并保存 |
+| `, t` | 开关自动应用目录偏好 |
+| `, R` | 重置当前目录偏好 |
+
+偏好文件使用 `$XDG_STATE_HOME/yazi/pref-by-location`，未设置时位于 `~/.local/state/yazi/pref-by-location`。该文件留在本机，不迁移或提交；其他自定义排序快捷键需在命令末尾追加 `plugin pref-by-location -- save` 才会保存。

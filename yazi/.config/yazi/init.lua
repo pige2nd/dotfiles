@@ -55,3 +55,8 @@ require("augment-command"):setup {
 		home .. "/Workspace",
 	},
 }
+
+-- Save per-directory preferences outside the configuration tree.
+require("pref-by-location"):setup {
+	save_path = (os.getenv("XDG_STATE_HOME") or (home .. "/.local/state")) .. "/yazi/pref-by-location",
+}
