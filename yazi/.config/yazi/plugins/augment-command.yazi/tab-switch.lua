@@ -40,7 +40,8 @@ local exec = ya.sync(function(_, args, config)
 
 	-- Iterate from the number of current open tabs
 	-- to the given tab number
-	for _ = number_of_open_tabs, tab_index - 1 do
+	-- tab_index is zero-based; include the target index when creating tabs.
+	for _ = number_of_open_tabs, tab_index do
 
 		-- Call the tab create command
 		ya.emit("tab_create", { current_tab.cwd })
