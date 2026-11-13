@@ -19,11 +19,6 @@ rev = "0be29a9"
 hash = "3f8d49413bc8691b4c652eb417a20178"
 
 [[plugin.deps]]
-use = "yazi-rs/plugins:jump-to-char"
-rev = "0be29a9"
-hash = "7a4b4237223aaa94e589d1c01a23542a"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:toggle-pane"
 rev = "0be29a9"
 hash = "15e5b67a241172cbb86b8fbf9e63692"

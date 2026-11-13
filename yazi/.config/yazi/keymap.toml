@@ -20,7 +20,7 @@ run = "plugin augment-command.enter"
 desc = "Smart enter/open, including archives"
 
 [[mgr.prepend_keymap]]
-on = "h"
+on = "f"
 run = "plugin searchjump"
 desc = "Searchjump with pinyin initial matching"
 
@@ -68,11 +68,6 @@ desc = "Switch/create tab 2"
 on = [ "t", "3" ]
 run = "plugin augment-command.tab-switch -- 2"
 desc = "Switch/create tab 3"
-
-[[mgr.prepend_keymap]]
-on = "f"
-run = "plugin jump-to-char"
-desc = "Jump to char"
 
 [[mgr.prepend_keymap]]
 on = "F"

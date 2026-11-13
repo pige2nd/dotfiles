@@ -8,7 +8,7 @@ Personal Yazi configuration for macOS.
   - `i` / `k`: up / down with wraparound
   - `j`: leave directory
   - `l`: smart enter/open/archive handling via `augment-command`
-- Chinese pinyin initial matching with `searchjump.yazi` + `sjch.yazi`
+- `f`：文件名片段和中文拼音首字母搜索，按提示标签跳转（`searchjump.yazi` + `sjch.yazi`）
 - Markdown preview via `glow` + `piper.yazi`
 - Directory tree preview via `eza`
 - Media/image preview via `mediainfo.yazi`
