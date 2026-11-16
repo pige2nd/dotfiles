@@ -1,5 +1,10 @@
 --- @since 26.5.6
 
+-- Finder tags are only available on macOS.
+if ya.target_os() ~= "macos" then
+	return { fetch = function() return true end }
+end
+
 local update = ya.sync(function(st, tags)
 	for path, tag in pairs(tags) do
 		st.tags[path] = #tag > 0 and tag or nil

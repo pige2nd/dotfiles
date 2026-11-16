@@ -74,3 +74,9 @@ stow --no-folding --target="$HOME" yazi
 - `g l`：在当前目录打开 lazygit，退出后返回 Yazi；两端均需安装 `lazygit`。
 
 macOS 可运行 `brew install lazygit`，WSL 使用当前系统已安装的 lazygit。
+
+## macOS 文件标签
+
+`mactag` 仅在 macOS 初始化、读取和修改 Finder 文件标签，`b a` 添加标签，`b r` 移除标签。需要先运行 `brew install tag`。
+
+这些快捷键仅注册到 macOS；WSL 和其他系统不初始化标签功能，状态采集入口直接跳过，不调用 `tag`。

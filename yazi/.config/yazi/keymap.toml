@@ -116,11 +116,13 @@ desc = "Reset media/image preview options"
 
 [[mgr.prepend_keymap]]
 on = [ "b", "a" ]
+for = "macos"
 run = "plugin mactag add"
 desc = "Tag selected files"
 
 [[mgr.prepend_keymap]]
 on = [ "b", "r" ]
+for = "macos"
 run = "plugin mactag remove"
 desc = "Untag selected files"
 
