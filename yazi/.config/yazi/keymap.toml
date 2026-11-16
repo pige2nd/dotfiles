@@ -193,3 +193,14 @@ desc = "Sort by birth time, reverse (save for this directory)"
 [[mgr.prepend_keymap]]
 on = [",", "e"]
 run = ["sort extension --reverse=no", "plugin pref-by-location -- save"]
+
+[[mgr.prepend_keymap]]
+on = ["g", "D"]
+for = "linux"
+run = 'shell -- if [ -n "$WSL_DISTRO_NAME" ]; then ya emit cd /mnt/d; fi'
+desc = "Go to D drive in WSL"
+
+[[mgr.prepend_keymap]]
+on = ["g", "l"]
+run = "shell --block -- lazygit"
+desc = "Open lazygit in the current directory"

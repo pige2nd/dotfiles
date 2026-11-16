@@ -1,6 +1,6 @@
 # Yazi config
 
-Personal Yazi configuration for macOS.
+用于 macOS 与 WSL 的 Yazi 配置，平台专用行为按环境启用。
 
 ## Highlights
 
@@ -20,7 +20,7 @@ Personal Yazi configuration for macOS.
 ## External dependencies
 
 ```sh
-brew install yazi p7zip glow eza poppler mediainfo ffmpeg imagemagick pandoc
+brew install yazi p7zip glow eza poppler mediainfo ffmpeg imagemagick pandoc lazygit
 ```
 
 ## 安装
@@ -36,7 +36,7 @@ stow --no-folding --target="$HOME" yazi
 
 ## Notes
 
-This repo intentionally avoids Linux/WSL-specific integrations such as `wl-clipboard`, `gvfs`, and Windows opener rules.
+`g D` 仅在 WSL 执行跳转；其他通用快捷键跨平台复用。
 
 ## 按目录记忆偏好
 
@@ -67,3 +67,10 @@ This repo intentionally avoids Linux/WSL-specific integrations such as `wl-clipb
 | `t r` | 重置预览布局 |
 
 收录的 `augment-command.yazi/tab-switch.lua` 修正了缺失标签少建一个的边界错误。插件更新时应保留或核对这处修正。
+
+## 导航与 Git 工具
+
+- `g D`：仅在 WSL 跳转到 `/mnt/d`；macOS 不注册此键，普通 Linux 不执行跳转。
+- `g l`：在当前目录打开 lazygit，退出后返回 Yazi；两端均需安装 `lazygit`。
+
+macOS 可运行 `brew install lazygit`，WSL 使用当前系统已安装的 lazygit。
