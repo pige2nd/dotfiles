@@ -1,0 +1,87 @@
+[mgr]
+scrolloff = 8
+
+[preview]
+wrap = "yes"
+max_width = 280
+max_height = 210
+image_filter = "lanczos3"
+max_size = 10485760
+
+[tasks]
+image_alloc = 536870912
+
+# 为普通文件注册 Git status fetcher。
+[[plugin.prepend_fetchers]]
+url = "*"
+run = "git"
+group = "git"
+
+# 为目录注册 Git status fetcher。
+[[plugin.prepend_fetchers]]
+url = "*/"
+run = "git"
+group = "git"
+
+
+[[plugin.prepend_preloaders]]
+mime = "{audio,video,image}/*"
+run = "mediainfo"
+
+[[plugin.prepend_preloaders]]
+mime = "application/{subrip,postscript,illustrator,dvb.ait,vnd.adobe.illustrator,eps}"
+run = "mediainfo"
+
+[[plugin.prepend_preloaders]]
+url = "*.{ai,eps,ait,psd}"
+run = "mediainfo"
+
+[[plugin.prepend_previewers]]
+mime = "{audio,video,image}/*"
+run = "mediainfo"
+
+[[plugin.prepend_previewers]]
+mime = "application/{subrip,postscript,illustrator,dvb.ait,vnd.adobe.illustrator,eps}"
+run = "mediainfo"
+
+[[plugin.prepend_previewers]]
+url = "*.{ai,eps,ait,psd}"
+run = "mediainfo"
+
+[[plugin.prepend_previewers]]
+url = "*.{doc,docx,rtf,odt,xls,xlsx,ppt,pptx,DOC,DOCX,RTF,ODT,XLS,XLSX,PPT,PPTX}"
+run = 'piper --wrap -- "$HOME/.config/yazi/scripts/office-preview" "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*.md"
+run = 'piper --wrap -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*/"
+run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"'
+
+[opener]
+edit = [
+  { run = 'nvim %s', block = true, desc = "nvim", for = "unix" },
+]
+bulk-rename = [
+  { run = 'nvim %s', block = true, desc = "Bulk rename in nvim", for = "unix" },
+]
+
+glow = [
+  { run = 'glow -p -w="$(tput cols)" %s1', block = true, desc = "Glow" }
+]
+win = [
+  { run = 'for f in %s; do (cd /mnt/c && cmd.exe /C start "" "$(wslpath -w "$f")"); done', orphan = true, desc = "Open with Windows default program", for = "linux" }
+]
+
+[open]
+prepend_rules = [
+  { url = "bulk-rename.txt", use = "bulk-rename" },
+  # 必须将原来的 name 改为 url
+  { url = "*.md", use = ["edit", "win", "glow"] },
+  { mime = "text/*", use = ["edit", "win"] },
+  { mime = "application/{json,ndjson,javascript,wine-extension-ini}", use = ["edit", "win"] },
+  { mime = "inode/empty", use = ["edit", "win"] },
+  { url = "*", use = "win" }
+]

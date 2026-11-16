@@ -29,10 +29,10 @@ brew install yazi p7zip glow eza poppler mediainfo ffmpeg imagemagick pandoc laz
 
 ```sh
 cd ~/dotfiles
-stow --no-folding --target="$HOME" yazi
+./yazi/install.sh
 ```
 
-已收录的插件和主题随配置一起部署。`ya pkg install` 或插件更新可能修改 Stow 管理的目录；如需更新，请检查 Git 差异后提交。
+插件以仓库已收录的快照为准，安装时不下载或升级插件。更新时应检查 Git 差异，并保留标签补建与 macOS 限定等已有修正。
 
 ## Notes
 
@@ -80,3 +80,15 @@ macOS 可运行 `brew install lazygit`，WSL 使用当前系统已安装的 lazy
 `mactag` 仅在 macOS 初始化、读取和修改 Finder 文件标签，`b a` 添加标签，`b r` 移除标签。需要先运行 `brew install tag`。
 
 这些快捷键仅注册到 macOS；WSL 和其他系统不初始化标签功能，状态采集入口直接跳过，不调用 `tag`。
+
+## 平台配置与 Stow 部署
+
+- 公共插件、快捷键和初始化：`yazi/.config/yazi/`。
+- 默认主题和打开规则：`yazi/profiles/default/.config/yazi/`，供 macOS 与普通 Linux 使用。
+- WSL 主题和打开规则：`yazi/profiles/wsl/.config/yazi/`，保留 Dracula、Windows 程序打开和 Glow 备选；文本仍默认 Neovim。
+
+`yazi/install.sh` 使用 GNU Stow 链接公共配置与当前平台配置，依据 `WSL_DISTRO_NAME` 选择 WSL。修改正在生效的 `~/.config/yazi/theme.toml` 会直接修改对应平台的仓库文件。Mac 和 WSL 的主题可以分别调整。
+
+本机目录偏好继续保存在 `~/.local/state/yazi/pref-by-location`，不放入 Stow 包。旧配置的 Git 历史、备份文件和运行数据不进入公共包。
+
+公共 `full-border` 保留 WSL 当前在 Yazi 26.8.15 已验证的边框渲染实现；与标签补建、mactag 平台判断一样，以仓库中的实际源码为准。

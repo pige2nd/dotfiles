@@ -1,0 +1,6 @@
+^/profiles
+^/install\.sh$
+README.*
+LICENSE.*
+\.git
+\.gitignore

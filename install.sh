@@ -8,5 +8,6 @@ if ! command -v stow >/dev/null 2>&1; then
 fi
 
 cd "$repo_dir"
-stow --no-folding --target="$HOME" --restow zsh tmux yazi nvim
+stow --no-folding --target="$HOME" --restow zsh tmux nvim
+"$repo_dir/yazi/install.sh"
 printf '%s\n' '已部署 Zsh、Starship、tmux、Yazi 和 Neovim 配置。插件安装见 README.md。'

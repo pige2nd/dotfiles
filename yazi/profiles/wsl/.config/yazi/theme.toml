@@ -1,0 +1,4 @@
+[flavor]
+# 临时试用官方 Dracula flavor；预览和键位配置均不变。
+dark = "dracula"
+
